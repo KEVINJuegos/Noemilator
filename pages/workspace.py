@@ -131,12 +131,12 @@ def workspace(page: fl.Page):
             spacing=0,
             horizontal_alignment=fl.CrossAxisAlignment.CENTER,
         ),
-        bgcolor="#252526",
+        bgcolor="#1E1E1E",
         padding=fl.padding.only(top=10),
         width=75,
     )
 
-    hud_bars = fl.Column(controls=[top_embed, sidebar])
+    hud_bars = fl.Column(controls=[top_embed, sidebar], spacing=0)
 
     return fl.View(
         route="/workspace",
