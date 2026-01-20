@@ -1,7 +1,7 @@
 # main.py
 import flet as fl
-from Pages.main_menu import main_menu
-from Pages.workspace import workspace
+from pages.main_menu import main_menu
+from pages.workspace import workspace
 
 
 def main(page: fl.Page):

@@ -19,6 +19,7 @@ def main_menu(page: fl.Page):
 
     return fl.View(
         route="/",
+        bgcolor="#121212",
         controls=[
             fl.Container(
                 content=principal,
