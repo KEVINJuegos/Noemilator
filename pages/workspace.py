@@ -2,7 +2,8 @@ import flet as fl
 from .panels.dashboard import panel_creator_dashboard
 
 # from .panels.events import panel_creator_events
-# from .panels.grupos import panel_creator_classesgroups
+from .panels.grupos import panel_creator_classesgroups
+
 # from .panels.humans import panel_creator_humans
 # from .panels.places import panel_creator_places
 # from .panels.objects import panel_creator_objects
@@ -108,7 +109,7 @@ def workspace(page: fl.Page):
 
     # fmt: off
     button_dashboard.on_click = change_panel(button_dashboard, panel_creator_dashboard)
-    # button_classesgroups.on_click = change_panel(button_classesgroups, panel_creator_classesgroups
+    button_classesgroups.on_click = change_panel(button_classesgroups, panel_creator_classesgroups)
     # button_events.on_click = change_panel(button_events, panel_creator_events)
     # button_places.on_click = change_panel(button_places, panel_creator_places)
     # button_humans.on_click = change_panel(button_humans, panel_creator_humans)
