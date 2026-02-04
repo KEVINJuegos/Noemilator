@@ -1,5 +1,11 @@
-# workspace.py
 import flet as fl
+from .panels.dashboard import panel_creator_dashboard
+
+# from .panels.events import panel_creator_events
+# from .panels.grupos import panel_creator_classesgroups
+# from .panels.humans import panel_creator_humans
+# from .panels.places import panel_creator_places
+# from .panels.objects import panel_creator_objects
 
 
 def workspace(page: fl.Page):
@@ -7,6 +13,7 @@ def workspace(page: fl.Page):
     page.bgcolor = "#121212"
     page.theme_mode = fl.ThemeMode.DARK
 
+    # ╔¤═══════¤TOP EMBED¤════════¤╗
     projecto_name = fl.TextField(
         value="Nueva planificación",
         border=fl.InputBorder.NONE,
@@ -17,117 +24,103 @@ def workspace(page: fl.Page):
 
     NoemilatorTM = fl.Row(
         controls=[
-            fl.Text("🚀", size=30),  # EMOJI TEMPORAL, BUSCAR LOGO
-            fl.Text(
-                "Noemilator",
-                size=22,
-                weight=fl.FontWeight.BOLD,
-                color="white",
-            ),
+            fl.Text("🚀", size=30),
+            fl.Text("Noemilator", size=22, weight=fl.FontWeight.BOLD, color="white"),
         ],
         spacing=10,
     )
 
     top_embed = fl.Container(
         content=fl.Row(
-            controls=[
-                projecto_name,
-                NoemilatorTM,
-            ],
+            controls=[projecto_name, NoemilatorTM],
             alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
         ),
         bgcolor="#1E1E1E",
         padding=fl.padding.symmetric(horizontal=20, vertical=10),
-        # padding=None  # Ancho de la barra superior, pendiente a escoger
+    )
+    # ╚¤═══════¤TOP EMBED¤════════¤╝
+
+    main_area = fl.Container(
+        expand=True,
+        padding=0,
     )
 
     # ╔¤═══════¤SIDE-BAR BUTTONS¤════════¤╗
-    button_dashboard = fl.Container(
-        content=fl.Column(
-            controls=[
-                fl.Icon(fl.Icons.DASHBOARD, size=24, color="white"),
-                fl.Text("Dashboard", size=10, color="white"),
-            ],
-            horizontal_alignment=fl.CrossAxisAlignment.CENTER,
-            spacing=2,
-        ),
-        padding=10,
-        border=fl.border.only(left=fl.BorderSide(2, "white")),
-        bgcolor="#2D2D2D",
-    )
+    def create_sidebar_button(icono, texto, activo=False):
+        icon = fl.Icon(icono, size=24, color="white" if activo else "#858585")
+        text = fl.Text(texto, size=10, color="white" if activo else "#858585")
+        return fl.Container(
+            content=fl.Column(
+                controls=[icon, text],
+                horizontal_alignment=fl.CrossAxisAlignment.CENTER,
+                spacing=2,
+            ),
+            padding=10,
+            border=fl.border.only(left=fl.BorderSide(2, "white")) if activo else None,
+            bgcolor="#2D2D2D" if activo else None,
+        )
 
-    button_events = fl.Container(
-        content=fl.Column(
-            controls=[
-                fl.Icon(fl.Icons.EVENT, size=24, color="#858585"),
-                fl.Text("Eventos", size=10, color="#858585"),
-            ],
-            horizontal_alignment=fl.CrossAxisAlignment.CENTER,
-            spacing=2,
-        ),
-        padding=10,
-    )
+    # fmt: off
+    button_dashboard = create_sidebar_button( fl.Icons.DASHBOARD, "Dashboard", activo=True)
+    button_events = create_sidebar_button(fl.Icons.EVENT, "Eventos")
+    button_classesgroups = create_sidebar_button(fl.Icons.GROUP, "Grupos")
+    button_places = create_sidebar_button(fl.Icons.LOCATION_ON, "Locales")
+    button_humans = create_sidebar_button(fl.Icons.PERSON, "Humanos")
+    button_objects = create_sidebar_button(fl.Icons.INVENTORY_2, "Objetos")
+    # fmt: on
 
-    button_classesgroups = fl.Container(
-        content=fl.Column(
-            controls=[
-                fl.Icon(fl.Icons.GROUP, size=24, color="#858585"),
-                fl.Text("Grupos", size=10, color="#858585"),
-            ],
-            horizontal_alignment=fl.CrossAxisAlignment.CENTER,
-            spacing=2,
-        ),
-        padding=10,
-    )
-
-    button_places = fl.Container(
-        content=fl.Column(
-            controls=[
-                fl.Icon(fl.Icons.LOCATION_ON, size=24, color="#858585"),
-                fl.Text("Locales", size=10, color="#858585"),
-            ],
-            horizontal_alignment=fl.CrossAxisAlignment.CENTER,
-            spacing=2,
-        ),
-        padding=10,
-    )
-
-    button_humans = fl.Container(
-        content=fl.Column(
-            controls=[
-                fl.Icon(fl.Icons.PERSON, size=24, color="#858585"),
-                fl.Text("Humanos", size=10, color="#858585"),
-            ],
-            horizontal_alignment=fl.CrossAxisAlignment.CENTER,
-            spacing=2,
-        ),
-        padding=10,
-    )
-
-    button_objects = fl.Container(
-        content=fl.Column(
-            controls=[
-                fl.Icon(fl.Icons.INVENTORY_2, size=24, color="#858585"),
-                fl.Text("Objetos", size=10, color="#858585"),
-            ],
-            horizontal_alignment=fl.CrossAxisAlignment.CENTER,
-            spacing=2,
-        ),
-        padding=10,
-    )
-
+    sidebar_buttons = [
+        button_dashboard,
+        button_events,
+        button_classesgroups,
+        button_places,
+        button_humans,
+        button_objects,
+    ]
     # ╚¤═══════¤SIDE-BAR BUTTONS¤════════¤╝
 
+    # ╔¤═══════¤NAVGEGACIÓN PANELS¤════════¤╗
+    def unmark_buttonsidebar(sidebar_button):
+        icon = sidebar_button.content.controls[0]
+        text = sidebar_button.content.controls[1]
+        icon.color = "#858585"
+        text.color = "#858585"
+        sidebar_button.bgcolor = None
+        sidebar_button.border = None
+
+    def mark_buttonsidebar(sidebar_button):
+        icon = sidebar_button.content.controls[0]
+        text = sidebar_button.content.controls[1]
+        icon.color = "white"
+        text.color = "white"
+        sidebar_button.bgcolor = "#2D2D2D"
+        sidebar_button.border = fl.border.only(left=fl.BorderSide(2, "white"))
+
+    def change_panel(sidebar_button, panel_creator):
+        def handler(e):
+            for button in sidebar_buttons:
+                unmark_buttonsidebar(button)
+            mark_buttonsidebar(sidebar_button)
+            main_area.content = panel_creator(page)
+            page.update()
+
+        return handler
+
+    # fmt: off
+    button_dashboard.on_click = change_panel(button_dashboard, panel_creator_dashboard)
+    # button_classesgroups.on_click = change_panel(button_classesgroups, panel_creator_classesgroups
+    # button_events.on_click = change_panel(button_events, panel_creator_events)
+    # button_places.on_click = change_panel(button_places, panel_creator_places)
+    # button_humans.on_click = change_panel(button_humans, panel_creator_humans)
+    # button_objects.on_click = change_panel(button_objects, panel_creator_objects)
+    # fmt: on
+
+    # ╚¤═══════¤NAVGEGACIÓN PANELS¤════════¤╝
+
+    # ╔¤═══════¤WORKSPACE¤════════¤╗
     sidebar = fl.Container(
         content=fl.Column(
-            controls=[
-                button_dashboard,
-                button_events,
-                button_classesgroups,
-                button_places,
-                button_humans,
-                button_objects,
-            ],
+            controls=sidebar_buttons,
             spacing=0,
             horizontal_alignment=fl.CrossAxisAlignment.CENTER,
         ),
@@ -136,7 +129,19 @@ def workspace(page: fl.Page):
         width=75,
     )
 
-    hud_bars = fl.Column(controls=[top_embed, sidebar], spacing=0)
+    area_trabajo = fl.Row(
+        controls=[sidebar, main_area],
+        spacing=0,
+        expand=True,
+    )
+
+    hud_bars = fl.Column(
+        controls=[top_embed, area_trabajo],
+        spacing=0,
+        expand=True,
+    )
+
+    main_area.content = panel_creator_dashboard(page)
 
     return fl.View(
         route="/workspace",
@@ -144,3 +149,6 @@ def workspace(page: fl.Page):
         padding=0,
         controls=[hud_bars],
     )
+
+
+# ╚¤═══════¤WORKSPACE¤════════¤╝
