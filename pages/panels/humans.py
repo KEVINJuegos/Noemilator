@@ -241,6 +241,9 @@ def panel_creator_humans(page: fl.Page):
     )
     # ╚¤═══════¤HEADER¤════════¤╝
 
+    # Cargar datos existentes
+    [humans_list.controls.append(create_onlist_human(h)) for h in temp_save.get_humans()] # fmt: skip
+
     return fl.Container(
         content=fl.Column(
             controls=[

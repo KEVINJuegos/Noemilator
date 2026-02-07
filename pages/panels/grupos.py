@@ -111,6 +111,9 @@ def panel_creator_classesgroups(page: fl.Page):
     )
     # ╚¤═══════¤HEADER¤════════¤╝
 
+    # Cargar datos existentes
+    [grupos_list.controls.append(create_onlist_grupo(g)) for g in temp_save.get_grupos()]  # fmt: skip
+
     return fl.Container(
         content=fl.Column(
             controls=[

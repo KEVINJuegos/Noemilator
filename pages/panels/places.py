@@ -247,6 +247,9 @@ def panel_creator_places(page: fl.Page):
     )
     # ╚¤═══════¤HEADER¤════════¤╝
 
+    # Cargar datos existentes
+    [places_list.controls.append(create_onlist_place(p)) for p in temp_save.get_places()]  # fmt: skip
+
     return fl.Container(
         content=fl.Column(
             controls=[

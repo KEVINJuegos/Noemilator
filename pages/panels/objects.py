@@ -167,6 +167,9 @@ def panel_creator_objects(page: fl.Page):
     )
     # ╚¤═══════¤HEADER¤════════¤╝
 
+    # Cargar datos existentes
+    [objects_list.controls.append(create_onlist_object(o)) for o in temp_save.get_objects()]  # fmt: skip
+
     return fl.Container(
         content=fl.Column(
             controls=[
