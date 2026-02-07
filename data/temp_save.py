@@ -54,46 +54,10 @@ def remove_grupo(grupo_name):
 # ╚¤═══════¤GRUPOS¤════════¤╝
 
 
-# ╔¤═══════¤LUGARES¤════════¤╗
-def add_lugar(name, type_l=""):
-    global lugares
-    lugar = Place(name=name, type=type_l)
-    lugares.append(lugar)
-    return lugar
-
-
-def get_lugares():
-    return lugares
-
-
-def clear_lugares():
-    global lugares
-    lugares = []
-
-
-def remove_lugar(lugar_name):
-    global lugares
-    for l in lugares:
-        if l.name == lugar_name:
-            lugares.remove(l)
-            break
-
-
-def update_lugar_type(lugar_name, new_type):
-    global lugares
-    for l in lugares:
-        if l.name == lugar_name:
-            l.type = new_type
-            break
-
-
-# ╚¤═══════¤LUGARES¤════════¤╝
-
-
 # ╔¤═══════¤HUMANOS¤════════¤╗
-def add_humano(name, type_h="Profesor(a)"):
+def add_humano(name, type_h="", quantity=0):
     global humanos
-    humano = Human(name=name, type=type_h)
+    humano = Human(name=name, type=type_h, quantity=quantity)
     humanos.append(humano)
     return humano
 
@@ -123,7 +87,59 @@ def update_humano_type(humano_name, new_type):
             break
 
 
-# ╚¤═══════¤HUMANOS¤════════¤╝
+def update_humano_quantity(humano_name, new_quantity):
+    global humanos
+    for h in humanos:
+        if h.name == humano_name:
+            h.quantity = new_quantity
+            break
+
+
+# ╚¤═══════¤HUMANS¤════════¤╝
+
+
+# ╔¤═══════¤PLACES¤════════¤╗
+def add_lugar(name, type_l="", quantity=0):
+    global lugares
+    lugar = Place(name=name, type=type_l, quantity=quantity)
+    lugares.append(lugar)
+    return lugar
+
+
+def get_lugares():
+    return lugares
+
+
+def clear_lugares():
+    global lugares
+    lugares = []
+
+
+def remove_lugar(lugar_name):
+    global lugares
+    for l in lugares:
+        if l.name == lugar_name:
+            lugares.remove(l)
+            break
+
+
+def update_lugar_type(lugar_name, new_type):
+    global lugares
+    for l in lugares:
+        if l.name == lugar_name:
+            l.type = new_type
+            break
+
+
+def update_lugar_quantity(lugar_name, new_quantity):
+    global lugares
+    for l in lugares:
+        if l.name == lugar_name:
+            l.quantity = new_quantity
+            break
+
+
+# ╚¤═══════¤PLACES¤════════¤╝
 
 
 # ╔¤═══════¤OBJETOS¤════════¤╗

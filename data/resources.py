@@ -34,9 +34,10 @@ class ClassGroup:
 class Human:
     name: str
     type: str = ""
+    quantity: int = 0
 
     def __str__(self):
-        return f"{self.name} ({self.type})"
+        return f"{self.name} ({self.type}) x{self.quantity}"
 
 
 @dataclass
@@ -52,6 +53,7 @@ class Object:
 class Place:
     name: str
     type: str = ""
+    quantity: int = 0
 
     def __str__(self):
-        return f"{self.name} ({self.type})"
+        return f"{self.name} ({self.type}) x{self.quantity}"

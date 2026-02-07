@@ -53,6 +53,15 @@ def panel_creator_humans(page: fl.Page):
 
         return handler
 
+    def fl_update_quantity(humano_name):
+        def handler(e):
+            new_value = e.control.value
+            if new_value == "":
+                new_value = 0
+            temp_save.update_humano_quantity(humano_name, int(new_value))
+
+        return handler
+
     def create_onlist_humano(humano):
         type_color = TYPE_COLORS.get(humano.type, "#858585")
         type_icon = TYPE_ICONS.get(humano.type, fl.Icons.PERSON)
@@ -101,6 +110,23 @@ def panel_creator_humans(page: fl.Page):
                                     humano.name, icon_ref, badge_ref
                                 ),
                             ),
+                            fl.Text(
+                                "Cantidad:",
+                                size=13,
+                                color="#B0B0B0",
+                            ),
+                            fl.TextField(
+                                value=str(humano.quantity),
+                                bgcolor="#3D3D3D",
+                                border_color="#858585",
+                                color="white",
+                                width=70,
+                                height=40,
+                                text_size=13,
+                                text_align=fl.TextAlign.CENTER,
+                                input_filter=fl.NumbersOnlyInputFilter(),
+                                on_change=fl_update_quantity(humano.name),
+                            ),
                             fl.IconButton(
                                 icon=fl.Icons.DELETE,
                                 icon_color="#F44336",
@@ -145,19 +171,40 @@ def panel_creator_humans(page: fl.Page):
         options=[fl.dropdown.Option(t) for t in HUMAN_TYPES],
     )
 
+    input_humano_quantity = fl.TextField(
+        label="Cantidad",
+        value="0",
+        bgcolor="#2D2D2D",
+        border_color="#858585",
+        color="white",
+        width=80,
+        height=50,
+        text_size=13,
+        text_align=fl.TextAlign.CENTER,
+        input_filter=fl.NumbersOnlyInputFilter(),
+    )
+
     def fl_add_humano(e):
         if not input_humano_name.value:
             return
         if not dropdown_humano_type.value:
             return
 
+        if not input_humano_quantity.value or input_humano_quantity.value == "":
+            input_humano_quantity.value = "0"
+            quantity = 0
+        else:
+            quantity = int(input_humano_quantity.value)
+
         humano = temp_save.add_humano(
             name=input_humano_name.value,
             type_h=dropdown_humano_type.value,
+            quantity=quantity,
         )
         humanos_list.controls.append(create_onlist_humano(humano))
         input_humano_name.value = ""
         dropdown_humano_type.value = None
+        input_humano_quantity.value = "0"
         page.update()
 
     addhumano_button = fl.ElevatedButton(
@@ -183,6 +230,7 @@ def panel_creator_humans(page: fl.Page):
                 controls=[
                     input_humano_name,
                     dropdown_humano_type,
+                    input_humano_quantity,
                     addhumano_button,
                 ],
                 spacing=10,

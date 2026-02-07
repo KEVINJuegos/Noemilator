@@ -59,6 +59,15 @@ def panel_creator_places(page: fl.Page):
 
         return handler
 
+    def fl_update_quantity(lugar_name):
+        def handler(e):
+            new_value = e.control.value
+            if new_value == "":
+                new_value = 0
+            temp_save.update_lugar_quantity(lugar_name, int(new_value))
+
+        return handler
+
     def create_onlist_lugar(lugar):
         type_color = TYPE_COLORS.get(lugar.type, "#858585")
         type_icon = TYPE_ICONS.get(lugar.type, fl.Icons.PLACE)
@@ -107,6 +116,23 @@ def panel_creator_places(page: fl.Page):
                                     lugar.name, icon_ref, badge_ref
                                 ),
                             ),
+                            fl.Text(
+                                "Cantidad:",
+                                size=13,
+                                color="#B0B0B0",
+                            ),
+                            fl.TextField(
+                                value=str(lugar.quantity),
+                                bgcolor="#3D3D3D",
+                                border_color="#858585",
+                                color="white",
+                                width=70,
+                                height=40,
+                                text_size=13,
+                                text_align=fl.TextAlign.CENTER,
+                                input_filter=fl.NumbersOnlyInputFilter(),
+                                on_change=fl_update_quantity(lugar.name),
+                            ),
                             fl.IconButton(
                                 icon=fl.Icons.DELETE,
                                 icon_color="#F44336",
@@ -151,19 +177,40 @@ def panel_creator_places(page: fl.Page):
         options=[fl.dropdown.Option(t) for t in PLACE_TYPES],
     )
 
+    input_lugar_quantity = fl.TextField(
+        label="Cantidad",
+        value="0",
+        bgcolor="#2D2D2D",
+        border_color="#858585",
+        color="white",
+        width=80,
+        height=50,
+        text_size=13,
+        text_align=fl.TextAlign.CENTER,
+        input_filter=fl.NumbersOnlyInputFilter(),
+    )
+
     def fl_add_lugar(e):
         if not input_lugar_name.value:
             return
         if not dropdown_lugar_type.value:
             return
 
+        if not input_lugar_quantity.value or input_lugar_quantity.value == "":
+            input_lugar_quantity.value = "0"
+            quantity = 0
+        else:
+            quantity = int(input_lugar_quantity.value)
+
         lugar = temp_save.add_lugar(
             name=input_lugar_name.value,
             type_l=dropdown_lugar_type.value,
+            quantity=quantity,
         )
         lugares_list.controls.append(create_onlist_lugar(lugar))
         input_lugar_name.value = ""
         dropdown_lugar_type.value = None
+        input_lugar_quantity.value = "0"
         page.update()
 
     addlugar_button = fl.ElevatedButton(
@@ -189,6 +236,7 @@ def panel_creator_places(page: fl.Page):
                 controls=[
                     input_lugar_name,
                     dropdown_lugar_type,
+                    input_lugar_quantity,
                     addlugar_button,
                 ],
                 spacing=10,
