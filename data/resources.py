@@ -2,6 +2,26 @@
 from dataclasses import dataclass
 
 
+HUMAN_TYPES = [
+    "Profesor(a)",
+    "Secretario(a)",
+    "Directivo(a)",
+    "Seguridad",
+    "Otro",
+]
+
+PLACE_TYPES = [
+    "Aula",
+    "Lab. Física",
+    "Lab. Química",
+    "Lab. Biología",
+    "Lab. Informática",
+    "Área de Deportes",
+    "Sala de Reuniones",
+    "Otro",
+]
+
+
 @dataclass
 class ClassGroup:
     name: str
@@ -13,7 +33,7 @@ class ClassGroup:
 @dataclass
 class Human:
     name: str
-    type: str = "Profesor(a)"
+    type: str = ""
 
     def __str__(self):
         return f"{self.name} ({self.type})"
@@ -31,6 +51,7 @@ class Object:
 @dataclass
 class Place:
     name: str
+    type: str = ""
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.type})"

@@ -55,9 +55,9 @@ def remove_grupo(grupo_name):
 
 
 # ╔¤═══════¤LUGARES¤════════¤╗
-def add_lugar(name):
+def add_lugar(name, type_l=""):
     global lugares
-    lugar = Place(name=name)
+    lugar = Place(name=name, type=type_l)
     lugares.append(lugar)
     return lugar
 
@@ -76,6 +76,14 @@ def remove_lugar(lugar_name):
     for l in lugares:
         if l.name == lugar_name:
             lugares.remove(l)
+            break
+
+
+def update_lugar_type(lugar_name, new_type):
+    global lugares
+    for l in lugares:
+        if l.name == lugar_name:
+            l.type = new_type
             break
 
 

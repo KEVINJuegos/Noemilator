@@ -1,14 +1,7 @@
 # humans.py
 import flet as fl
 from data import temp_save
-
-HUMAN_TYPES = [
-    "Profesor(a)",
-    "Secretario(a)",
-    "Directivo(a)",
-    "Seguridad",
-    "Otro",
-]
+from data.resources import HUMAN_TYPES
 
 TYPE_COLORS = {
     "Profesor(a)": "#FF9800",
