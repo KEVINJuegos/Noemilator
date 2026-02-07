@@ -40,6 +40,14 @@ def clear_grupos():
     grupos = []
 
 
+def remove_grupo(grupo_name):
+    global grupos
+    for g in grupos:
+        if g["name"] == grupo_name:
+            grupos.remove(g)
+            break
+
+
 # ╚¤═══════¤GRUPOS¤════════¤╝
 
 
