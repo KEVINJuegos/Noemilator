@@ -1,12 +1,6 @@
 import flet as fl
 from .panels.dashboard import panel_creator_dashboard
-
-# from .panels.events import panel_creator_events
 from .panels.grupos import panel_creator_classesgroups
-
-# from .panels.humans import panel_creator_humans
-# from .panels.places import panel_creator_places
-# from .panels.objects import panel_creator_objects
 
 
 def workspace(page: fl.Page):
@@ -15,13 +9,18 @@ def workspace(page: fl.Page):
     page.theme_mode = fl.ThemeMode.DARK
 
     # ╔¤═══════¤TOP EMBED¤════════¤╗
+    from data import temp_save
+
     projecto_name = fl.TextField(
-        value="Nueva planificación",
+        value=temp_save.projecto_name,
         border=fl.InputBorder.NONE,
         text_size=18,
         color="white",
         width=300,
+        on_blur=temp_save.fl_save_projecto_name,
     )
+
+    save_button = temp_save.create_save_button(page)
 
     NoemilatorTM = fl.Row(
         controls=[
@@ -33,7 +32,10 @@ def workspace(page: fl.Page):
 
     top_embed = fl.Container(
         content=fl.Row(
-            controls=[projecto_name, NoemilatorTM],
+            controls=[
+                fl.Row(controls=[projecto_name, save_button], spacing=5),
+                NoemilatorTM,
+            ],
             alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
         ),
         bgcolor="#1E1E1E",
