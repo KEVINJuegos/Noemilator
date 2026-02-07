@@ -5,6 +5,9 @@ import json
 # ╔¤═══════¤VARIABLES TEMPORALES¤════════¤╗
 projecto_name = "Nuevo Proyecto"
 grupos = []
+lugares = []
+humanos = []
+objetos = []
 # ╚¤═══════¤VARIABLES TEMPORALES¤════════¤╝
 
 
@@ -51,22 +54,118 @@ def remove_grupo(grupo_name):
 # ╚¤═══════¤GRUPOS¤════════¤╝
 
 
+# ╔¤═══════¤LUGARES¤════════¤╗
+def add_lugar(name):
+    global lugares
+    lugar = {
+        "name": name,
+    }
+    lugares.append(lugar)
+    return lugar
+
+
+def get_lugares():
+    return lugares
+
+
+def clear_lugares():
+    global lugares
+    lugares = []
+
+
+def remove_lugar(lugar_name):
+    global lugares
+    for l in lugares:
+        if l["name"] == lugar_name:
+            lugares.remove(l)
+            break
+
+
+# ╚¤═══════¤LUGARES¤════════¤╝
+
+
+# ╔¤═══════¤HUMANOS¤════════¤╗
+def add_humano(name):
+    global humanos
+    humano = {
+        "name": name,
+    }
+    humanos.append(humano)
+    return humano
+
+
+def get_humanos():
+    return humanos
+
+
+def clear_humanos():
+    global humanos
+    humanos = []
+
+
+def remove_humano(humano_name):
+    global humanos
+    for h in humanos:
+        if h["name"] == humano_name:
+            humanos.remove(h)
+            break
+
+
+# ╚¤═══════¤HUMANOS¤════════¤╝
+
+
+# ╔¤═══════¤OBJETOS¤════════¤╗
+def add_objeto(name):
+    global objetos
+    objeto = {
+        "name": name,
+    }
+    objetos.append(objeto)
+    return objeto
+
+
+def get_objetos():
+    return objetos
+
+
+def clear_objetos():
+    global objetos
+    objetos = []
+
+
+def remove_objeto(objeto_name):
+    global objetos
+    for o in objetos:
+        if o["name"] == objeto_name:
+            objetos.remove(o)
+            break
+
+
+# ╚¤═══════¤OBJETOS¤════════¤╝
+
+
 # ╔¤═══════¤EXPORT/IMPORT JSON¤════════¤╗
 def export_to_json(filepath):
     data = {
         "projecto_name": projecto_name,
         "grupos": grupos,
+        "lugares": lugares,
+        "humanos": humanos,
+        "objetos": objetos,
     }
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 # def import_from_json(filepath):
-#     global projecto_name, grupos
+#     global projecto_name, grupos, lugares, humanos, objetos
 #     with open(filepath, "r", encoding="utf-8") as f:
 #         data = json.load(f)
 #     projecto_name = data.get("projecto_name", "Nuevo Proyecto")
 #     grupos = data.get("grupos", [])
+#     lugares = data.get("lugares", [])
+#     humanos = data.get("humanos", [])
+#     objetos = data.get("objetos", [])
 # ╚¤═══════¤EXPORT/IMPORT JSON¤════════¤╝
 
 
