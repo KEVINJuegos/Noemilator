@@ -1,4 +1,3 @@
-# places.py
 import flet as fl
 from data import temp_save
 from data.resources import PLACE_TYPES
@@ -28,29 +27,29 @@ TYPE_ICONS = {
 
 def panel_creator_places(page: fl.Page):
 
-    # ╔¤═══════¤LUGARES AGREGADOS¤════════¤╗
-    lugares_list = fl.Column(
+    # ╔¤═══════¤PLACES LIST¤════════¤╗
+    places_list = fl.Column(
         controls=[],
         spacing=10,
         scroll=fl.ScrollMode.AUTO,
         expand=True,
     )
 
-    def fl_delete_lugar(lugar_name):
+    def fl_delete_place(place_name):
         def handler(e):
-            temp_save.remove_lugar(lugar_name)
-            for control in lugares_list.controls:
-                if control.data == lugar_name:
-                    lugares_list.controls.remove(control)
+            temp_save.remove_place(place_name)
+            for control in places_list.controls:
+                if control.data == place_name:
+                    places_list.controls.remove(control)
                     break
             page.update()
 
         return handler
 
-    def fl_update_type(lugar_name, icon_ref, badge_ref):
+    def fl_update_type(place_name, icon_ref, badge_ref):
         def handler(e):
             new_type = e.control.value
-            temp_save.update_lugar_type(lugar_name, new_type)
+            temp_save.update_place_type(place_name, new_type)
             icon_ref.color = TYPE_COLORS.get(new_type, "#858585")
             icon_ref.name = TYPE_ICONS.get(new_type, fl.Icons.PLACE)
             badge_ref.bgcolor = TYPE_COLORS.get(new_type, "#858585")
@@ -59,24 +58,24 @@ def panel_creator_places(page: fl.Page):
 
         return handler
 
-    def fl_update_quantity(lugar_name):
+    def fl_update_quantity(place_name):
         def handler(e):
             new_value = e.control.value
             if new_value == "":
                 new_value = 0
-            temp_save.update_lugar_quantity(lugar_name, int(new_value))
+            temp_save.update_place_quantity(place_name, int(new_value))
 
         return handler
 
-    def create_onlist_lugar(lugar):
-        type_color = TYPE_COLORS.get(lugar.type, "#858585")
-        type_icon = TYPE_ICONS.get(lugar.type, fl.Icons.PLACE)
+    def create_onlist_place(place):
+        type_color = TYPE_COLORS.get(place.type, "#858585")
+        type_icon = TYPE_ICONS.get(place.type, fl.Icons.PLACE)
 
         icon_ref = fl.Icon(type_icon, color=type_color)
 
         badge_ref = fl.Container(
             content=fl.Text(
-                lugar.type,
+                place.type,
                 size=11,
                 color="white",
             ),
@@ -86,14 +85,14 @@ def panel_creator_places(page: fl.Page):
         )
 
         return fl.Container(
-            data=lugar.name,
+            data=place.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             icon_ref,
                             fl.Text(
-                                lugar.name,
+                                place.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -105,7 +104,7 @@ def panel_creator_places(page: fl.Page):
                     fl.Row(
                         controls=[
                             fl.Dropdown(
-                                value=lugar.type,
+                                value=place.type,
                                 bgcolor="#3D3D3D",
                                 border_color="#858585",
                                 color="white",
@@ -113,7 +112,7 @@ def panel_creator_places(page: fl.Page):
                                 text_size=13,
                                 options=[fl.dropdown.Option(t) for t in PLACE_TYPES],
                                 on_change=fl_update_type(
-                                    lugar.name, icon_ref, badge_ref
+                                    place.name, icon_ref, badge_ref
                                 ),
                             ),
                             fl.Text(
@@ -122,7 +121,7 @@ def panel_creator_places(page: fl.Page):
                                 color="#B0B0B0",
                             ),
                             fl.TextField(
-                                value=str(lugar.quantity),
+                                value=str(place.quantity),
                                 bgcolor="#3D3D3D",
                                 border_color="#858585",
                                 color="white",
@@ -131,14 +130,14 @@ def panel_creator_places(page: fl.Page):
                                 text_size=13,
                                 text_align=fl.TextAlign.CENTER,
                                 input_filter=fl.NumbersOnlyInputFilter(),
-                                on_change=fl_update_quantity(lugar.name),
+                                on_change=fl_update_quantity(place.name),
                             ),
                             fl.IconButton(
                                 icon=fl.Icons.DELETE,
                                 icon_color="#F44336",
                                 icon_size=20,
                                 tooltip="Eliminar lugar",
-                                on_click=fl_delete_lugar(lugar.name),
+                                on_click=fl_delete_place(place.name),
                             ),
                         ],
                         spacing=5,
@@ -153,10 +152,10 @@ def panel_creator_places(page: fl.Page):
             padding=fl.padding.only(left=15, top=8, bottom=8, right=8),
         )
 
-    # ╚¤═══════¤LUGARES AGREGADOS¤════════¤╝
+    # ╚¤═══════¤PLACES LIST¤════════¤╝
 
     # ╔¤═══════¤INPUTS¤════════¤╗
-    input_lugar_name = fl.TextField(
+    input_place_name = fl.TextField(
         label="Nombre del lugar",
         bgcolor="#2D2D2D",
         border_color="#858585",
@@ -166,7 +165,7 @@ def panel_creator_places(page: fl.Page):
         text_size=13,
     )
 
-    dropdown_lugar_type = fl.Dropdown(
+    dropdown_place_type = fl.Dropdown(
         label="Tipo",
         value=None,
         bgcolor="#2D2D2D",
@@ -177,7 +176,7 @@ def panel_creator_places(page: fl.Page):
         options=[fl.dropdown.Option(t) for t in PLACE_TYPES],
     )
 
-    input_lugar_quantity = fl.TextField(
+    input_place_quantity = fl.TextField(
         label="Cantidad",
         value="0",
         bgcolor="#2D2D2D",
@@ -190,41 +189,41 @@ def panel_creator_places(page: fl.Page):
         input_filter=fl.NumbersOnlyInputFilter(),
     )
 
-    def fl_add_lugar(e):
-        if not input_lugar_name.value:
+    def fl_add_place(e):
+        if not input_place_name.value:
             return
-        if not dropdown_lugar_type.value:
+        if not dropdown_place_type.value:
             return
 
-        if not input_lugar_quantity.value or input_lugar_quantity.value == "":
-            input_lugar_quantity.value = "0"
+        if not input_place_quantity.value or input_place_quantity.value == "":
+            input_place_quantity.value = "0"
             quantity = 0
         else:
-            quantity = int(input_lugar_quantity.value)
+            quantity = int(input_place_quantity.value)
 
-        lugar = temp_save.add_lugar(
-            name=input_lugar_name.value,
-            type_l=dropdown_lugar_type.value,
+        place = temp_save.add_place(
+            name=input_place_name.value,
+            type_p=dropdown_place_type.value,
             quantity=quantity,
         )
-        lugares_list.controls.append(create_onlist_lugar(lugar))
-        input_lugar_name.value = ""
-        dropdown_lugar_type.value = None
-        input_lugar_quantity.value = "0"
+        places_list.controls.append(create_onlist_place(place))
+        input_place_name.value = ""
+        dropdown_place_type.value = None
+        input_place_quantity.value = "0"
         page.update()
 
-    addlugar_button = fl.ElevatedButton(
+    add_place_button = fl.ElevatedButton(
         text="Add",
         icon=fl.Icons.ADD,
         bgcolor="#2196F3",
         color="white",
         height=45,
-        on_click=fl_add_lugar,
+        on_click=fl_add_place,
     )
     # ╚¤═══════¤INPUTS¤════════¤╝
 
     # ╔¤═══════¤HEADER¤════════¤╗
-    header_lugares = fl.Row(
+    header_places = fl.Row(
         controls=[
             fl.Text(
                 "📍 Lugares",
@@ -234,10 +233,10 @@ def panel_creator_places(page: fl.Page):
             ),
             fl.Row(
                 controls=[
-                    input_lugar_name,
-                    dropdown_lugar_type,
-                    input_lugar_quantity,
-                    addlugar_button,
+                    input_place_name,
+                    dropdown_place_type,
+                    input_place_quantity,
+                    add_place_button,
                 ],
                 spacing=10,
                 vertical_alignment=fl.CrossAxisAlignment.CENTER,
@@ -251,9 +250,9 @@ def panel_creator_places(page: fl.Page):
     return fl.Container(
         content=fl.Column(
             controls=[
-                header_lugares,
+                header_places,
                 fl.Divider(height=10, color="#3D3D3D"),
-                lugares_list,
+                places_list,
             ],
             spacing=10,
             expand=True,

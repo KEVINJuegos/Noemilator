@@ -4,44 +4,44 @@ from data import temp_save
 
 def panel_creator_objects(page: fl.Page):
 
-    # ╔¤═══════¤OBJETOS AGREGADOS¤════════¤╗
-    objetos_list = fl.Column(
+    # ╔¤═══════¤OBJECTS LIST¤════════¤╗
+    objects_list = fl.Column(
         controls=[],
         spacing=10,
         scroll=fl.ScrollMode.AUTO,
         expand=True,
     )
 
-    def fl_delete_objeto(objeto_name):
+    def fl_delete_object(object_name):
         def handler(e):
-            temp_save.remove_objeto(objeto_name)
-            for control in objetos_list.controls:
-                if control.data == objeto_name:
-                    objetos_list.controls.remove(control)
+            temp_save.remove_object(object_name)
+            for control in objects_list.controls:
+                if control.data == object_name:
+                    objects_list.controls.remove(control)
                     break
             page.update()
 
         return handler
 
-    def fl_update_quantity(objeto_name):
+    def fl_update_quantity(object_name):
         def handler(e):
             new_value = e.control.value
             if new_value == "":
                 new_value = 0
-            temp_save.update_objeto_quantity(objeto_name, int(new_value))
+            temp_save.update_object_quantity(object_name, int(new_value))
 
         return handler
 
-    def create_onlist_objeto(objeto):
+    def create_onlist_object(obj):
         return fl.Container(
-            data=objeto.name,
+            data=obj.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             fl.Icon(fl.Icons.INVENTORY_2, color="#9C27B0"),
                             fl.Text(
-                                objeto.name,
+                                obj.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -57,7 +57,7 @@ def panel_creator_objects(page: fl.Page):
                                 color="#B0B0B0",
                             ),
                             fl.TextField(
-                                value=str(objeto.quantity),
+                                value=str(obj.quantity),
                                 bgcolor="#3D3D3D",
                                 border_color="#858585",
                                 color="white",
@@ -66,14 +66,14 @@ def panel_creator_objects(page: fl.Page):
                                 text_size=13,
                                 text_align=fl.TextAlign.CENTER,
                                 input_filter=fl.NumbersOnlyInputFilter(),
-                                on_change=fl_update_quantity(objeto.name),
+                                on_change=fl_update_quantity(obj.name),
                             ),
                             fl.IconButton(
                                 icon=fl.Icons.DELETE,
                                 icon_color="#F44336",
                                 icon_size=20,
                                 tooltip="Eliminar objeto",
-                                on_click=fl_delete_objeto(objeto.name),
+                                on_click=fl_delete_object(obj.name),
                             ),
                         ],
                         spacing=5,
@@ -88,10 +88,10 @@ def panel_creator_objects(page: fl.Page):
             padding=fl.padding.only(left=15, top=8, bottom=8, right=8),
         )
 
-    # ╚¤═══════¤OBJETOS AGREGADOS¤════════¤╝
+    # ╚¤═══════¤OBJECTS LIST¤════════¤╝
 
     # ╔¤═══════¤INPUTS¤════════¤╗
-    input_objeto_name = fl.TextField(
+    input_object_name = fl.TextField(
         label="Nombre del objeto",
         bgcolor="#2D2D2D",
         border_color="#858585",
@@ -101,7 +101,7 @@ def panel_creator_objects(page: fl.Page):
         text_size=13,
     )
 
-    input_objeto_quantity = fl.TextField(
+    input_object_quantity = fl.TextField(
         label="Cantidad",
         value="0",
         bgcolor="#2D2D2D",
@@ -114,37 +114,37 @@ def panel_creator_objects(page: fl.Page):
         input_filter=fl.NumbersOnlyInputFilter(),
     )
 
-    def fl_add_objeto(e):
-        if not input_objeto_name.value:
+    def fl_add_object(e):
+        if not input_object_name.value:
             return
 
-        if not input_objeto_quantity.value or input_objeto_quantity.value == "":
-            input_objeto_quantity.value = "0"
+        if not input_object_quantity.value or input_object_quantity.value == "":
+            input_object_quantity.value = "0"
             quantity = 0
         else:
-            quantity = int(input_objeto_quantity.value)
+            quantity = int(input_object_quantity.value)
 
-        objeto = temp_save.add_objeto(
-            name=input_objeto_name.value,
+        obj = temp_save.add_object(
+            name=input_object_name.value,
             quantity=quantity,
         )
-        objetos_list.controls.append(create_onlist_objeto(objeto))
-        input_objeto_name.value = ""
-        input_objeto_quantity.value = "0"
+        objects_list.controls.append(create_onlist_object(obj))
+        input_object_name.value = ""
+        input_object_quantity.value = "0"
         page.update()
 
-    addobjeto_button = fl.ElevatedButton(
+    add_object_button = fl.ElevatedButton(
         text="Add",
         icon=fl.Icons.ADD,
         bgcolor="#9C27B0",
         color="white",
         height=45,
-        on_click=fl_add_objeto,
+        on_click=fl_add_object,
     )
     # ╚¤═══════¤INPUTS¤════════¤╝
 
     # ╔¤═══════¤HEADER¤════════¤╗
-    header_objetos = fl.Row(
+    header_objects = fl.Row(
         controls=[
             fl.Text(
                 "📦 Objetos",
@@ -154,9 +154,9 @@ def panel_creator_objects(page: fl.Page):
             ),
             fl.Row(
                 controls=[
-                    input_objeto_name,
-                    input_objeto_quantity,
-                    addobjeto_button,
+                    input_object_name,
+                    input_object_quantity,
+                    add_object_button,
                 ],
                 spacing=10,
                 vertical_alignment=fl.CrossAxisAlignment.CENTER,
@@ -170,9 +170,9 @@ def panel_creator_objects(page: fl.Page):
     return fl.Container(
         content=fl.Column(
             controls=[
-                header_objetos,
+                header_objects,
                 fl.Divider(height=10, color="#3D3D3D"),
-                objetos_list,
+                objects_list,
             ],
             spacing=10,
             expand=True,

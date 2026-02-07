@@ -1,4 +1,3 @@
-# temp_save.py
 import flet as fl
 import json
 from dataclasses import asdict
@@ -7,13 +6,13 @@ from data.resources import ClassGroup, Human, Object, Place
 # ╔¤═══════¤VARIABLES TEMPORALES¤════════¤╗
 projecto_name = "Nuevo Proyecto"
 grupos: list[ClassGroup] = []
-lugares: list[Place] = []
-humanos: list[Human] = []
-objetos: list[Object] = []
+places: list[Place] = []
+humans: list[Human] = []
+objects: list[Object] = []
 # ╚¤═══════¤VARIABLES TEMPORALES¤════════¤╝
 
 
-# ╔¤═══════¤PROJECTO NAME¤════════¤╗
+# ╔¤═══════¤PROJECT NAME¤════════¤╗
 def save_projecto_name(name):
     global projecto_name
     projecto_name = name
@@ -23,7 +22,7 @@ def fl_save_projecto_name(e):
     save_projecto_name(e.control.value)
 
 
-# ╚¤═══════¤PROJECTO NAME¤════════¤╝
+# ╚¤═══════¤PROJECT NAME¤════════¤╝
 
 
 # ╔¤═══════¤GRUPOS¤════════¤╗
@@ -54,43 +53,43 @@ def remove_grupo(grupo_name):
 # ╚¤═══════¤GRUPOS¤════════¤╝
 
 
-# ╔¤═══════¤HUMANOS¤════════¤╗
-def add_humano(name, type_h="", quantity=0):
-    global humanos
-    humano = Human(name=name, type=type_h, quantity=quantity)
-    humanos.append(humano)
-    return humano
+# ╔¤═══════¤HUMANS¤════════¤╗
+def add_human(name, type_h="", quantity=0):
+    global humans
+    human = Human(name=name, type=type_h, quantity=quantity)
+    humans.append(human)
+    return human
 
 
-def get_humanos():
-    return humanos
+def get_humans():
+    return humans
 
 
-def clear_humanos():
-    global humanos
-    humanos = []
+def clear_humans():
+    global humans
+    humans = []
 
 
-def remove_humano(humano_name):
-    global humanos
-    for h in humanos:
-        if h.name == humano_name:
-            humanos.remove(h)
+def remove_human(human_name):
+    global humans
+    for h in humans:
+        if h.name == human_name:
+            humans.remove(h)
             break
 
 
-def update_humano_type(humano_name, new_type):
-    global humanos
-    for h in humanos:
-        if h.name == humano_name:
+def update_human_type(human_name, new_type):
+    global humans
+    for h in humans:
+        if h.name == human_name:
             h.type = new_type
             break
 
 
-def update_humano_quantity(humano_name, new_quantity):
-    global humanos
-    for h in humanos:
-        if h.name == humano_name:
+def update_human_quantity(human_name, new_quantity):
+    global humans
+    for h in humans:
+        if h.name == human_name:
             h.quantity = new_quantity
             break
 
@@ -99,83 +98,83 @@ def update_humano_quantity(humano_name, new_quantity):
 
 
 # ╔¤═══════¤PLACES¤════════¤╗
-def add_lugar(name, type_l="", quantity=0):
-    global lugares
-    lugar = Place(name=name, type=type_l, quantity=quantity)
-    lugares.append(lugar)
-    return lugar
+def add_place(name, type_p="", quantity=0):
+    global places
+    place = Place(name=name, type=type_p, quantity=quantity)
+    places.append(place)
+    return place
 
 
-def get_lugares():
-    return lugares
+def get_places():
+    return places
 
 
-def clear_lugares():
-    global lugares
-    lugares = []
+def clear_places():
+    global places
+    places = []
 
 
-def remove_lugar(lugar_name):
-    global lugares
-    for l in lugares:
-        if l.name == lugar_name:
-            lugares.remove(l)
+def remove_place(place_name):
+    global places
+    for p in places:
+        if p.name == place_name:
+            places.remove(p)
             break
 
 
-def update_lugar_type(lugar_name, new_type):
-    global lugares
-    for l in lugares:
-        if l.name == lugar_name:
-            l.type = new_type
+def update_place_type(place_name, new_type):
+    global places
+    for p in places:
+        if p.name == place_name:
+            p.type = new_type
             break
 
 
-def update_lugar_quantity(lugar_name, new_quantity):
-    global lugares
-    for l in lugares:
-        if l.name == lugar_name:
-            l.quantity = new_quantity
+def update_place_quantity(place_name, new_quantity):
+    global places
+    for p in places:
+        if p.name == place_name:
+            p.quantity = new_quantity
             break
 
 
 # ╚¤═══════¤PLACES¤════════¤╝
 
 
-# ╔¤═══════¤OBJETOS¤════════¤╗
-def add_objeto(name, quantity=0):
-    global objetos
-    objeto = Object(name=name, quantity=quantity)
-    objetos.append(objeto)
-    return objeto
+# ╔¤═══════¤OBJECTS¤════════¤╗
+def add_object(name, quantity=0):
+    global objects
+    obj = Object(name=name, quantity=quantity)
+    objects.append(obj)
+    return obj
 
 
-def get_objetos():
-    return objetos
+def get_objects():
+    return objects
 
 
-def clear_objetos():
-    global objetos
-    objetos = []
+def clear_objects():
+    global objects
+    objects = []
 
 
-def remove_objeto(objeto_name):
-    global objetos
-    for o in objetos:
-        if o.name == objeto_name:
-            objetos.remove(o)
+def remove_object(object_name):
+    global objects
+    for o in objects:
+        if o.name == object_name:
+            objects.remove(o)
             break
 
 
-def update_objeto_quantity(objeto_name, new_quantity):
-    global objetos
-    for o in objetos:
-        if o.name == objeto_name:
+def update_object_quantity(object_name, new_quantity):
+    global objects
+    for o in objects:
+        if o.name == object_name:
             o.quantity = new_quantity
             break
 
 
-# ╚¤═══════¤OBJETOS¤════════¤╝
+# ╚¤═══════¤OBJECTS¤════════¤╝
 
 
 # ╔¤═══════¤EXPORT/IMPORT JSON¤════════¤╗
@@ -183,9 +182,9 @@ def export_to_json(filepath):
     data = {
         "projecto_name": projecto_name,
         "grupos": [asdict(g) for g in grupos],
-        "lugares": [asdict(l) for l in lugares],
-        "humanos": [asdict(h) for h in humanos],
-        "objetos": [asdict(o) for o in objetos],
+        "places": [asdict(p) for p in places],
+        "humans": [asdict(h) for h in humans],
+        "objects": [asdict(o) for o in objects],
     }
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)

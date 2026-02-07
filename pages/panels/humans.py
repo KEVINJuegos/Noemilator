@@ -1,4 +1,3 @@
-# humans.py
 import flet as fl
 from data import temp_save
 from data.resources import HUMAN_TYPES
@@ -22,29 +21,29 @@ TYPE_ICONS = {
 
 def panel_creator_humans(page: fl.Page):
 
-    # ╔¤═══════¤HUMANOS AGREGADOS¤════════¤╗
-    humanos_list = fl.Column(
+    # ╔¤═══════¤HUMANS LIST¤════════¤╗
+    humans_list = fl.Column(
         controls=[],
         spacing=10,
         scroll=fl.ScrollMode.AUTO,
         expand=True,
     )
 
-    def fl_delete_humano(humano_name):
+    def fl_delete_human(human_name):
         def handler(e):
-            temp_save.remove_humano(humano_name)
-            for control in humanos_list.controls:
-                if control.data == humano_name:
-                    humanos_list.controls.remove(control)
+            temp_save.remove_human(human_name)
+            for control in humans_list.controls:
+                if control.data == human_name:
+                    humans_list.controls.remove(control)
                     break
             page.update()
 
         return handler
 
-    def fl_update_type(humano_name, icon_ref, badge_ref):
+    def fl_update_type(human_name, icon_ref, badge_ref):
         def handler(e):
             new_type = e.control.value
-            temp_save.update_humano_type(humano_name, new_type)
+            temp_save.update_human_type(human_name, new_type)
             icon_ref.color = TYPE_COLORS.get(new_type, "#858585")
             icon_ref.name = TYPE_ICONS.get(new_type, fl.Icons.PERSON)
             badge_ref.bgcolor = TYPE_COLORS.get(new_type, "#858585")
@@ -53,24 +52,24 @@ def panel_creator_humans(page: fl.Page):
 
         return handler
 
-    def fl_update_quantity(humano_name):
+    def fl_update_quantity(human_name):
         def handler(e):
             new_value = e.control.value
             if new_value == "":
                 new_value = 0
-            temp_save.update_humano_quantity(humano_name, int(new_value))
+            temp_save.update_human_quantity(human_name, int(new_value))
 
         return handler
 
-    def create_onlist_humano(humano):
-        type_color = TYPE_COLORS.get(humano.type, "#858585")
-        type_icon = TYPE_ICONS.get(humano.type, fl.Icons.PERSON)
+    def create_onlist_human(human):
+        type_color = TYPE_COLORS.get(human.type, "#858585")
+        type_icon = TYPE_ICONS.get(human.type, fl.Icons.PERSON)
 
         icon_ref = fl.Icon(type_icon, color=type_color)
 
         badge_ref = fl.Container(
             content=fl.Text(
-                humano.type,
+                human.type,
                 size=11,
                 color="white",
             ),
@@ -80,14 +79,14 @@ def panel_creator_humans(page: fl.Page):
         )
 
         return fl.Container(
-            data=humano.name,
+            data=human.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             icon_ref,
                             fl.Text(
-                                humano.name,
+                                human.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -99,7 +98,7 @@ def panel_creator_humans(page: fl.Page):
                     fl.Row(
                         controls=[
                             fl.Dropdown(
-                                value=humano.type,
+                                value=human.type,
                                 bgcolor="#3D3D3D",
                                 border_color="#858585",
                                 color="white",
@@ -107,7 +106,7 @@ def panel_creator_humans(page: fl.Page):
                                 text_size=13,
                                 options=[fl.dropdown.Option(t) for t in HUMAN_TYPES],
                                 on_change=fl_update_type(
-                                    humano.name, icon_ref, badge_ref
+                                    human.name, icon_ref, badge_ref
                                 ),
                             ),
                             fl.Text(
@@ -116,7 +115,7 @@ def panel_creator_humans(page: fl.Page):
                                 color="#B0B0B0",
                             ),
                             fl.TextField(
-                                value=str(humano.quantity),
+                                value=str(human.quantity),
                                 bgcolor="#3D3D3D",
                                 border_color="#858585",
                                 color="white",
@@ -125,14 +124,14 @@ def panel_creator_humans(page: fl.Page):
                                 text_size=13,
                                 text_align=fl.TextAlign.CENTER,
                                 input_filter=fl.NumbersOnlyInputFilter(),
-                                on_change=fl_update_quantity(humano.name),
+                                on_change=fl_update_quantity(human.name),
                             ),
                             fl.IconButton(
                                 icon=fl.Icons.DELETE,
                                 icon_color="#F44336",
                                 icon_size=20,
                                 tooltip="Eliminar humano",
-                                on_click=fl_delete_humano(humano.name),
+                                on_click=fl_delete_human(human.name),
                             ),
                         ],
                         spacing=5,
@@ -147,10 +146,10 @@ def panel_creator_humans(page: fl.Page):
             padding=fl.padding.only(left=15, top=8, bottom=8, right=8),
         )
 
-    # ╚¤═══════¤HUMANOS AGREGADOS¤════════¤╝
+    # ╚¤═══════¤HUMANS LIST¤════════¤╝
 
     # ╔¤═══════¤INPUTS¤════════¤╗
-    input_humano_name = fl.TextField(
+    input_human_name = fl.TextField(
         label="Nombre del humano",
         bgcolor="#2D2D2D",
         border_color="#858585",
@@ -160,7 +159,7 @@ def panel_creator_humans(page: fl.Page):
         text_size=13,
     )
 
-    dropdown_humano_type = fl.Dropdown(
+    dropdown_human_type = fl.Dropdown(
         label="Tipo",
         value=None,
         bgcolor="#2D2D2D",
@@ -171,7 +170,7 @@ def panel_creator_humans(page: fl.Page):
         options=[fl.dropdown.Option(t) for t in HUMAN_TYPES],
     )
 
-    input_humano_quantity = fl.TextField(
+    input_human_quantity = fl.TextField(
         label="Cantidad",
         value="0",
         bgcolor="#2D2D2D",
@@ -184,41 +183,41 @@ def panel_creator_humans(page: fl.Page):
         input_filter=fl.NumbersOnlyInputFilter(),
     )
 
-    def fl_add_humano(e):
-        if not input_humano_name.value:
+    def fl_add_human(e):
+        if not input_human_name.value:
             return
-        if not dropdown_humano_type.value:
+        if not dropdown_human_type.value:
             return
 
-        if not input_humano_quantity.value or input_humano_quantity.value == "":
-            input_humano_quantity.value = "0"
+        if not input_human_quantity.value or input_human_quantity.value == "":
+            input_human_quantity.value = "0"
             quantity = 0
         else:
-            quantity = int(input_humano_quantity.value)
+            quantity = int(input_human_quantity.value)
 
-        humano = temp_save.add_humano(
-            name=input_humano_name.value,
-            type_h=dropdown_humano_type.value,
+        human = temp_save.add_human(
+            name=input_human_name.value,
+            type_h=dropdown_human_type.value,
             quantity=quantity,
         )
-        humanos_list.controls.append(create_onlist_humano(humano))
-        input_humano_name.value = ""
-        dropdown_humano_type.value = None
-        input_humano_quantity.value = "0"
+        humans_list.controls.append(create_onlist_human(human))
+        input_human_name.value = ""
+        dropdown_human_type.value = None
+        input_human_quantity.value = "0"
         page.update()
 
-    addhumano_button = fl.ElevatedButton(
+    add_human_button = fl.ElevatedButton(
         text="Add",
         icon=fl.Icons.ADD,
         bgcolor="#FF9800",
         color="white",
         height=45,
-        on_click=fl_add_humano,
+        on_click=fl_add_human,
     )
     # ╚¤═══════¤INPUTS¤════════¤╝
 
     # ╔¤═══════¤HEADER¤════════¤╗
-    header_humanos = fl.Row(
+    header_humans = fl.Row(
         controls=[
             fl.Text(
                 "🧑 Humanos",
@@ -228,10 +227,10 @@ def panel_creator_humans(page: fl.Page):
             ),
             fl.Row(
                 controls=[
-                    input_humano_name,
-                    dropdown_humano_type,
-                    input_humano_quantity,
-                    addhumano_button,
+                    input_human_name,
+                    dropdown_human_type,
+                    input_human_quantity,
+                    add_human_button,
                 ],
                 spacing=10,
                 vertical_alignment=fl.CrossAxisAlignment.CENTER,
@@ -245,9 +244,9 @@ def panel_creator_humans(page: fl.Page):
     return fl.Container(
         content=fl.Column(
             controls=[
-                header_humanos,
+                header_humans,
                 fl.Divider(height=10, color="#3D3D3D"),
-                humanos_list,
+                humans_list,
             ],
             spacing=10,
             expand=True,
