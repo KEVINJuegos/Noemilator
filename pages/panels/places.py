@@ -25,16 +25,15 @@ def panel_creator_places(page: fl.Page):
         return handler
 
     def create_onlist_lugar(lugar):
-        lugar_name = lugar["name"]
         return fl.Container(
-            data=lugar_name,
+            data=lugar.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             fl.Icon(fl.Icons.PLACE, color="#2196F3"),
                             fl.Text(
-                                lugar_name,
+                                lugar.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -47,7 +46,7 @@ def panel_creator_places(page: fl.Page):
                         icon_color="#F44336",
                         icon_size=20,
                         tooltip="Eliminar lugar",
-                        on_click=fl_delete_lugar(lugar_name),
+                        on_click=fl_delete_lugar(lugar.name),
                     ),
                 ],
                 alignment=fl.MainAxisAlignment.SPACE_BETWEEN,

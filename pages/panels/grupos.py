@@ -1,3 +1,4 @@
+# grupos.py
 import flet as fl
 from data import temp_save
 
@@ -24,16 +25,15 @@ def panel_creator_classesgroups(page: fl.Page):
         return handler
 
     def create_onlist_grupo(grupo):
-        grupo_name = grupo["name"]
         return fl.Container(
-            data=grupo_name,
+            data=grupo.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             fl.Icon(fl.Icons.GROUP, color="#4CAF50"),
                             fl.Text(
-                                grupo_name,
+                                grupo.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -46,7 +46,7 @@ def panel_creator_classesgroups(page: fl.Page):
                         icon_color="#F44336",
                         icon_size=20,
                         tooltip="Eliminar grupo",
-                        on_click=fl_delete_grupo(grupo_name),
+                        on_click=fl_delete_grupo(grupo.name),
                     ),
                 ],
                 alignment=fl.MainAxisAlignment.SPACE_BETWEEN,

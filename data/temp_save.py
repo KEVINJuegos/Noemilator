@@ -1,13 +1,15 @@
 # temp_save.py
 import flet as fl
 import json
+from dataclasses import asdict
+from data.resources import ClassGroup, Human, Object, Place
 
 # ╔¤═══════¤VARIABLES TEMPORALES¤════════¤╗
 projecto_name = "Nuevo Proyecto"
-grupos = []
-lugares = []
-humanos = []
-objetos = []
+grupos: list[ClassGroup] = []
+lugares: list[Place] = []
+humanos: list[Human] = []
+objetos: list[Object] = []
 # ╚¤═══════¤VARIABLES TEMPORALES¤════════¤╝
 
 
@@ -27,9 +29,7 @@ def fl_save_projecto_name(e):
 # ╔¤═══════¤GRUPOS¤════════¤╗
 def add_grupo(name):
     global grupos
-    grupo = {
-        "name": name,
-    }
+    grupo = ClassGroup(name=name)
     grupos.append(grupo)
     return grupo
 
@@ -46,7 +46,7 @@ def clear_grupos():
 def remove_grupo(grupo_name):
     global grupos
     for g in grupos:
-        if g["name"] == grupo_name:
+        if g.name == grupo_name:
             grupos.remove(g)
             break
 
@@ -57,9 +57,7 @@ def remove_grupo(grupo_name):
 # ╔¤═══════¤LUGARES¤════════¤╗
 def add_lugar(name):
     global lugares
-    lugar = {
-        "name": name,
-    }
+    lugar = Place(name=name)
     lugares.append(lugar)
     return lugar
 
@@ -76,7 +74,7 @@ def clear_lugares():
 def remove_lugar(lugar_name):
     global lugares
     for l in lugares:
-        if l["name"] == lugar_name:
+        if l.name == lugar_name:
             lugares.remove(l)
             break
 
@@ -87,9 +85,7 @@ def remove_lugar(lugar_name):
 # ╔¤═══════¤HUMANOS¤════════¤╗
 def add_humano(name):
     global humanos
-    humano = {
-        "name": name,
-    }
+    humano = Human(name=name)
     humanos.append(humano)
     return humano
 
@@ -106,7 +102,7 @@ def clear_humanos():
 def remove_humano(humano_name):
     global humanos
     for h in humanos:
-        if h["name"] == humano_name:
+        if h.name == humano_name:
             humanos.remove(h)
             break
 
@@ -117,9 +113,7 @@ def remove_humano(humano_name):
 # ╔¤═══════¤OBJETOS¤════════¤╗
 def add_objeto(name):
     global objetos
-    objeto = {
-        "name": name,
-    }
+    objeto = Object(name=name)
     objetos.append(objeto)
     return objeto
 
@@ -136,7 +130,7 @@ def clear_objetos():
 def remove_objeto(objeto_name):
     global objetos
     for o in objetos:
-        if o["name"] == objeto_name:
+        if o.name == objeto_name:
             objetos.remove(o)
             break
 
@@ -148,24 +142,16 @@ def remove_objeto(objeto_name):
 def export_to_json(filepath):
     data = {
         "projecto_name": projecto_name,
-        "grupos": grupos,
-        "lugares": lugares,
-        "humanos": humanos,
-        "objetos": objetos,
+        "grupos": [asdict(g) for g in grupos],
+        "lugares": [asdict(l) for l in lugares],
+        "humanos": [asdict(h) for h in humanos],
+        "objetos": [asdict(o) for o in objetos],
     }
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 # def import_from_json(filepath):
-#     global projecto_name, grupos, lugares, humanos, objetos
-#     with open(filepath, "r", encoding="utf-8") as f:
-#         data = json.load(f)
-#     projecto_name = data.get("projecto_name", "Nuevo Proyecto")
-#     grupos = data.get("grupos", [])
-#     lugares = data.get("lugares", [])
-#     humanos = data.get("humanos", [])
-#     objetos = data.get("objetos", [])
 # ╚¤═══════¤EXPORT/IMPORT JSON¤════════¤╝
 
 

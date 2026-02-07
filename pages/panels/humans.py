@@ -25,16 +25,15 @@ def panel_creator_humans(page: fl.Page):
         return handler
 
     def create_onlist_humano(humano):
-        humano_name = humano["name"]
         return fl.Container(
-            data=humano_name,
+            data=humano.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             fl.Icon(fl.Icons.PERSON, color="#FF9800"),
                             fl.Text(
-                                humano_name,
+                                humano.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -47,7 +46,7 @@ def panel_creator_humans(page: fl.Page):
                         icon_color="#F44336",
                         icon_size=20,
                         tooltip="Eliminar humano",
-                        on_click=fl_delete_humano(humano_name),
+                        on_click=fl_delete_humano(humano.name),
                     ),
                 ],
                 alignment=fl.MainAxisAlignment.SPACE_BETWEEN,

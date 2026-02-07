@@ -25,16 +25,15 @@ def panel_creator_objects(page: fl.Page):
         return handler
 
     def create_onlist_objeto(objeto):
-        objeto_name = objeto["name"]
         return fl.Container(
-            data=objeto_name,
+            data=objeto.name,
             content=fl.Row(
                 controls=[
                     fl.Row(
                         controls=[
                             fl.Icon(fl.Icons.INVENTORY_2, color="#9C27B0"),
                             fl.Text(
-                                objeto_name,
+                                objeto.name,
                                 size=16,
                                 weight=fl.FontWeight.W_500,
                                 color="white",
@@ -47,7 +46,7 @@ def panel_creator_objects(page: fl.Page):
                         icon_color="#F44336",
                         icon_size=20,
                         tooltip="Eliminar objeto",
-                        on_click=fl_delete_objeto(objeto_name),
+                        on_click=fl_delete_objeto(objeto.name),
                     ),
                 ],
                 alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
