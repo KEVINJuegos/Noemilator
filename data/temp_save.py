@@ -111,9 +111,9 @@ def remove_humano(humano_name):
 
 
 # ╔¤═══════¤OBJETOS¤════════¤╗
-def add_objeto(name):
+def add_objeto(name, quantity=0):
     global objetos
-    objeto = Object(name=name)
+    objeto = Object(name=name, quantity=quantity)
     objetos.append(objeto)
     return objeto
 
@@ -132,6 +132,14 @@ def remove_objeto(objeto_name):
     for o in objetos:
         if o.name == objeto_name:
             objetos.remove(o)
+            break
+
+
+def update_objeto_quantity(objeto_name, new_quantity):
+    global objetos
+    for o in objetos:
+        if o.name == objeto_name:
+            o.quantity = new_quantity
             break
 
 

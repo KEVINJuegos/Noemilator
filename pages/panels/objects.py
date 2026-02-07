@@ -1,4 +1,3 @@
-# objects.py
 import flet as fl
 from data import temp_save
 
@@ -24,6 +23,15 @@ def panel_creator_objects(page: fl.Page):
 
         return handler
 
+    def fl_update_quantity(objeto_name):
+        def handler(e):
+            new_value = e.control.value
+            if new_value == "":
+                new_value = 0
+            temp_save.update_objeto_quantity(objeto_name, int(new_value))
+
+        return handler
+
     def create_onlist_objeto(objeto):
         return fl.Container(
             data=objeto.name,
@@ -41,12 +49,35 @@ def panel_creator_objects(page: fl.Page):
                         ],
                         spacing=10,
                     ),
-                    fl.IconButton(
-                        icon=fl.Icons.DELETE,
-                        icon_color="#F44336",
-                        icon_size=20,
-                        tooltip="Eliminar objeto",
-                        on_click=fl_delete_objeto(objeto.name),
+                    fl.Row(
+                        controls=[
+                            fl.Text(
+                                "Cantidad:",
+                                size=13,
+                                color="#B0B0B0",
+                            ),
+                            fl.TextField(
+                                value=str(objeto.quantity),
+                                bgcolor="#3D3D3D",
+                                border_color="#858585",
+                                color="white",
+                                width=70,
+                                height=40,
+                                text_size=13,
+                                text_align=fl.TextAlign.CENTER,
+                                input_filter=fl.NumbersOnlyInputFilter(),
+                                on_change=fl_update_quantity(objeto.name),
+                            ),
+                            fl.IconButton(
+                                icon=fl.Icons.DELETE,
+                                icon_color="#F44336",
+                                icon_size=20,
+                                tooltip="Eliminar objeto",
+                                on_click=fl_delete_objeto(objeto.name),
+                            ),
+                        ],
+                        spacing=5,
+                        vertical_alignment=fl.CrossAxisAlignment.CENTER,
                     ),
                 ],
                 alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
@@ -70,13 +101,36 @@ def panel_creator_objects(page: fl.Page):
         text_size=13,
     )
 
+    input_objeto_quantity = fl.TextField(
+        label="Cantidad",
+        value="0",
+        bgcolor="#2D2D2D",
+        border_color="#858585",
+        color="white",
+        width=80,
+        height=50,
+        text_size=13,
+        text_align=fl.TextAlign.CENTER,
+        input_filter=fl.NumbersOnlyInputFilter(),
+    )
+
     def fl_add_objeto(e):
         if not input_objeto_name.value:
             return
 
-        objeto = temp_save.add_objeto(name=input_objeto_name.value)
+        if not input_objeto_quantity.value or input_objeto_quantity.value == "":
+            input_objeto_quantity.value = "0"
+            quantity = 0
+        else:
+            quantity = int(input_objeto_quantity.value)
+
+        objeto = temp_save.add_objeto(
+            name=input_objeto_name.value,
+            quantity=quantity,
+        )
         objetos_list.controls.append(create_onlist_objeto(objeto))
         input_objeto_name.value = ""
+        input_objeto_quantity.value = "0"
         page.update()
 
     addobjeto_button = fl.ElevatedButton(
@@ -101,9 +155,11 @@ def panel_creator_objects(page: fl.Page):
             fl.Row(
                 controls=[
                     input_objeto_name,
+                    input_objeto_quantity,
                     addobjeto_button,
                 ],
                 spacing=10,
+                vertical_alignment=fl.CrossAxisAlignment.CENTER,
             ),
         ],
         alignment=fl.MainAxisAlignment.SPACE_BETWEEN,

@@ -21,9 +21,10 @@ class Human:
 @dataclass
 class Object:
     name: str
+    quantity: int = 0
 
     def __str__(self):
-        return self.name
+        return f"{self.name} x{self.quantity}"
 
 
 @dataclass
