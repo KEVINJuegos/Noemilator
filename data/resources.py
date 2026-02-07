@@ -13,9 +13,10 @@ class ClassGroup:
 @dataclass
 class Human:
     name: str
+    type: str = "Profesor(a)"
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.type})"
 
 
 @dataclass

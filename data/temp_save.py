@@ -83,9 +83,9 @@ def remove_lugar(lugar_name):
 
 
 # ╔¤═══════¤HUMANOS¤════════¤╗
-def add_humano(name):
+def add_humano(name, type_h="Profesor(a)"):
     global humanos
-    humano = Human(name=name)
+    humano = Human(name=name, type=type_h)
     humanos.append(humano)
     return humano
 
@@ -104,6 +104,14 @@ def remove_humano(humano_name):
     for h in humanos:
         if h.name == humano_name:
             humanos.remove(h)
+            break
+
+
+def update_humano_type(humano_name, new_type):
+    global humanos
+    for h in humanos:
+        if h.name == humano_name:
+            h.type = new_type
             break
 
 
