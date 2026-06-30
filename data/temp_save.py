@@ -1,3 +1,4 @@
+# temp_save.py
 import flet as fl
 import json
 from dataclasses import asdict
@@ -13,8 +14,10 @@ humans: list[Human] = []
 objects: list[Object] = []
 
 _next_event_id = 1
+
 schedule: Schedule = Schedule()
 schedule_events: dict = {}
+_next_schedule_event_id = 1
 # ╚¤═══════¤VARIABLES TEMPORALES¤════════¤╝
 
 
@@ -249,32 +252,51 @@ def remove_time_slot(number):
         del schedule_events[k]
 
 
-def clear_schedule():
-    global schedule, schedule_events
-    schedule = Schedule()
-    schedule_events = {}
-
-
 # ╚¤═══════¤SCHEDULE¤════════¤╝
 
 
 # ╔¤═══════¤SCHEDULE EVENTS¤════════¤╗
-def get_schedule_event(day, slot_number):
-    return schedule_events.get((day, slot_number))
+def get_schedule_events_at(day, slot_number):
+    return schedule_events.get((day, slot_number), [])
 
 
 def get_schedule_events():
-    return list(schedule_events.values())
+    result = []
+    for evs in schedule_events.values():
+        result.extend(evs)
+    return result
 
 
-def set_schedule_event(event: ScheduleEvent):
-    schedule_events[(event.day, event.slot_number)] = event
+def add_schedule_event(event: ScheduleEvent):
+    global _next_schedule_event_id
+    event.id = _next_schedule_event_id
+    _next_schedule_event_id += 1
+    key = (event.day, event.slot_number)
+    schedule_events.setdefault(key, []).append(event)
+    return event
 
 
-def remove_schedule_event(day, slot_number):
+def update_schedule_event(event: ScheduleEvent):
+    key = (event.day, event.slot_number)
+    lst = schedule_events.get(key, [])
+    for i, ev in enumerate(lst):
+        if ev.id == event.id:
+            lst[i] = event
+            break
+
+
+def remove_schedule_event(day, slot_number, event_id):
     key = (day, slot_number)
-    if key in schedule_events:
+    lst = schedule_events.get(key, [])
+    schedule_events[key] = [ev for ev in lst if ev.id != event_id]
+    if not schedule_events[key]:
         del schedule_events[key]
+
+
+def clear_schedule():
+    global schedule, schedule_events
+    schedule = Schedule()
+    schedule_events = {}
 
 
 # ╚¤═══════¤SCHEDULE EVENTS¤════════¤╝
@@ -290,7 +312,9 @@ def export_to_json(filepath):
         "objects": [asdict(o) for o in objects],
         "events": [asdict(ev) for ev in events],
         "schedule": asdict(schedule),
-        "schedule_events": [asdict(ev) for ev in schedule_events.values()],
+        "schedule_events": [
+            asdict(ev) for evs in schedule_events.values() for ev in evs
+        ],
     }
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)

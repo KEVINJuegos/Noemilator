@@ -1,6 +1,10 @@
+# dashboard.py
 import flet as fl
 from data import temp_save
 from data.resources import DAYS, ScheduleEvent
+
+EVENT_COLOR = "#FF9800"
+EVENT_ICON = fl.Icons.EVENT_NOTE
 
 
 def panel_creator_dashboard(page: fl.Page):
@@ -151,13 +155,15 @@ def panel_creator_dashboard(page: fl.Page):
     )
     # ╚¤═══════¤INPUTS DÍAS-TURNOS¤════════¤╝
 
-    # ╔¤═══════¤CREACION EVENTOS¤════════¤╗
-    def create_resource_checkboxes(items, label_fn, fill_color):
+    # ╔¤═══════¤SCHEDULE BLOCKS¤════════¤╗
+    def create_resource_checkboxes(
+        items, label_fn, fill_color, key_fn=lambda item: item.name
+    ):
         return fl.Column(
             controls=[
                 fl.Checkbox(
                     label=label_fn(item),
-                    data=item.name,
+                    data=key_fn(item),
                     value=False,
                     fill_color=fill_color,
                     check_color="white",
@@ -169,10 +175,17 @@ def panel_creator_dashboard(page: fl.Page):
             height=100,
         )
 
-    def create_resource_block(icon, title, color, available, selected_names):
-        checkboxes = create_resource_checkboxes(
-            available,
-            lambda item, t=title: (
+    def create_resource_block(
+        icon,
+        title,
+        color,
+        available,
+        selected_keys,
+        key_fn=lambda item: item.name,
+        label_fn=None,
+    ):
+        if label_fn is None:
+            label_fn = lambda item: (  # noqa: E731
                 f"{item.name} ({item.type})"
                 if hasattr(item, "type")
                 else (
@@ -180,11 +193,13 @@ def panel_creator_dashboard(page: fl.Page):
                     if hasattr(item, "quantity")
                     else item.name
                 )
-            ),
-            color,
+            )
+
+        checkboxes = create_resource_checkboxes(
+            available, label_fn, color, key_fn=key_fn
         )
         for cb in checkboxes.controls:
-            cb.value = cb.data in selected_names
+            cb.value = cb.data in selected_keys
 
         return (
             fl.Container(
@@ -219,72 +234,242 @@ def panel_creator_dashboard(page: fl.Page):
             checkboxes,
         )
 
-    def open_event_dialog(day: str, slot_number: int):
-        event = temp_save.get_schedule_event(day, slot_number)
-        if event is None:
-            event = ScheduleEvent(day=day, slot_number=slot_number)
+    # ╚¤═══════¤SCHEDULE BLOCKS¤════════¤╝
 
-        name_field = fl.TextField(
-            value=event.name,
-            label="Nombre del Evento",
-            bgcolor="#2D2D2D",
-            border_color="#858585",
-            color="white",
-            width=300,
-            text_size=14,
+    # ╔¤═══════¤FORMULARIO DE EVENTO¤════════¤╗
+    def open_event_form_dialog(day: str, slot_number: int, existing):
+        is_new = existing is None
+        base = existing if existing else ScheduleEvent(day=day, slot_number=slot_number)
+
+        events_block, events_checkboxes = create_resource_block(
+            EVENT_ICON,
+            "Eventos",
+            EVENT_COLOR,
+            temp_save.get_events(),
+            base.event_ids,
+            key_fn=lambda item: item.id,
+            label_fn=lambda item: f"#{item.id} {item.name}",
         )
-
         grupos_block, grupos_checkboxes = create_resource_block(
-            fl.Icons.GROUP, "Grupos", "#4CAF50", temp_save.get_grupos(), event.groups
+            fl.Icons.GROUP, "Grupos", "#4CAF50", temp_save.get_grupos(), base.groups
         )
         humans_block, humans_checkboxes = create_resource_block(
-            fl.Icons.PERSON, "Humanos", "#FF9800", temp_save.get_humans(), event.humans
+            fl.Icons.PERSON, "Humanos", "#FF9800", temp_save.get_humans(), base.humans
         )
         places_block, places_checkboxes = create_resource_block(
             fl.Icons.LOCATION_ON,
             "Lugares",
             "#2196F3",
             temp_save.get_places(),
-            event.places,
+            base.places,
         )
         objects_block, objects_checkboxes = create_resource_block(
             fl.Icons.INVENTORY_2,
             "Objetos",
             "#9C27B0",
             temp_save.get_objects(),
-            event.objects,
+            base.objects,
         )
 
-        def close_dialog(e):
+        def back_to_list(e):
             dialog.open = False
             page.update()
+            open_slot_dialog(day, slot_number)
 
         def save_event(e):
             new_event = ScheduleEvent(
                 day=day,
                 slot_number=slot_number,
-                name=name_field.value,
+                id=base.id,
+                event_ids=[cb.data for cb in events_checkboxes.controls if cb.value],
                 groups=[cb.data for cb in grupos_checkboxes.controls if cb.value],
                 humans=[cb.data for cb in humans_checkboxes.controls if cb.value],
                 places=[cb.data for cb in places_checkboxes.controls if cb.value],
                 objects=[cb.data for cb in objects_checkboxes.controls if cb.value],
             )
-            temp_save.set_schedule_event(new_event)
+            if is_new:
+                temp_save.add_schedule_event(new_event)
+            else:
+                temp_save.update_schedule_event(new_event)
             dialog.open = False
             rebuild_schedule_table()
             page.update()
+            open_slot_dialog(day, slot_number)
 
         def delete_event(e):
-            temp_save.remove_schedule_event(day, slot_number)
+            if not is_new:
+                temp_save.remove_schedule_event(day, slot_number, base.id)
             dialog.open = False
             rebuild_schedule_table()
             page.update()
+            open_slot_dialog(day, slot_number)
 
+        actions = [
+            fl.TextButton("Cancelar", on_click=back_to_list),
+            fl.ElevatedButton(
+                "Guardar", on_click=save_event, bgcolor="#4CAF50", color="white"
+            ),
+        ]
+        if not is_new:
+            actions.insert(
+                0,
+                fl.TextButton(
+                    "Eliminar",
+                    on_click=delete_event,
+                    style=fl.ButtonStyle(color="#F44336"),
+                ),
+            )
+
+        dialog = fl.AlertDialog(
+            modal=True,
+            title=fl.Text(
+                f"{'Nuevo evento' if is_new else 'Editar evento'} — {day} T{slot_number}",
+                size=16,
+                weight=fl.FontWeight.BOLD,
+            ),
+            content=fl.Container(
+                content=fl.Column(
+                    controls=[
+                        fl.Row(controls=[events_block, grupos_block], spacing=10),
+                        fl.Row(controls=[humans_block, places_block], spacing=10),
+                        objects_block,
+                    ],
+                    spacing=10,
+                    scroll=fl.ScrollMode.AUTO,
+                ),
+                width=400,
+                height=470,
+            ),
+            actions=actions,
+            actions_alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
+            bgcolor="#2D2D2D",
+        )
+        page.overlay.append(dialog)
+        dialog.open = True
+        page.update()
+
+    # ╚¤═══════¤FORMULARIO DE EVENTO¤════════¤╝
+
+    # ╔¤═══════¤EVENTOS EN CUBO════════¤╗
+    def open_slot_dialog(day: str, slot_number: int):
         slot_info = ""
         for slot in temp_save.get_schedule().time_slots:
             if slot.number == slot_number:
                 slot_info = f"{slot.start_time} - {slot.end_time}"
                 break
+
+        entries_list = fl.Column(spacing=8, scroll=fl.ScrollMode.AUTO)
+
+        def close_dialog(e):
+            dialog.open = False
+            page.update()
+
+        def create_entry_card(ev: ScheduleEvent):
+            event_names = [
+                e.name for e in temp_save.get_events() if e.id in ev.event_ids
+            ]
+            resource_data = [
+                (ev.groups, "👥", "#4CAF50"),
+                (ev.humans, "🧑", "#FF9800"),
+                (ev.places, "📍", "#2196F3"),
+                (ev.objects, "📦", "#9C27B0"),
+            ]
+            chips = [
+                fl.Container(
+                    content=fl.Text(f"{emoji}{len(items)}", size=9),
+                    bgcolor=color,
+                    border_radius=3,
+                    padding=2,
+                )
+                for items, emoji, color in resource_data
+                if items
+            ]
+
+            def fl_edit(e):
+                dialog.open = False
+                page.update()
+                open_event_form_dialog(day, slot_number, ev)
+
+            def fl_delete(e):
+                temp_save.remove_schedule_event(day, slot_number, ev.id)
+                rebuild_entries_list()
+                rebuild_schedule_table()
+                page.update()
+
+            return fl.Container(
+                content=fl.Row(
+                    controls=[
+                        fl.Column(
+                            controls=[
+                                fl.Row(
+                                    controls=[
+                                        fl.Icon(EVENT_ICON, color=EVENT_COLOR, size=16),
+                                        fl.Text(
+                                            (
+                                                ", ".join(event_names)
+                                                if event_names
+                                                else "(sin evento asignado)"
+                                            ),
+                                            size=13,
+                                            weight=fl.FontWeight.W_500,
+                                            color="white",
+                                        ),
+                                    ],
+                                    spacing=6,
+                                ),
+                                (
+                                    fl.Row(controls=chips, spacing=4, wrap=True)
+                                    if chips
+                                    else fl.Container()
+                                ),
+                            ],
+                            spacing=4,
+                            expand=True,
+                        ),
+                        fl.Row(
+                            controls=[
+                                fl.IconButton(
+                                    icon=fl.Icons.EDIT,
+                                    icon_color="#2196F3",
+                                    icon_size=18,
+                                    tooltip="Editar",
+                                    on_click=fl_edit,
+                                ),
+                                fl.IconButton(
+                                    icon=fl.Icons.DELETE,
+                                    icon_color="#F44336",
+                                    icon_size=18,
+                                    tooltip="Eliminar",
+                                    on_click=fl_delete,
+                                ),
+                            ],
+                            spacing=0,
+                        ),
+                    ],
+                    alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
+                    vertical_alignment=fl.CrossAxisAlignment.CENTER,
+                ),
+                bgcolor="#2D2D2D",
+                border_radius=8,
+                padding=10,
+            )
+
+        def rebuild_entries_list():
+            entries_list.controls.clear()
+            events_here = temp_save.get_schedule_events_at(day, slot_number)
+            if not events_here:
+                entries_list.controls.append(
+                    fl.Text("Sin eventos en este horario", size=12, color="#858585")
+                )
+            for ev in events_here:
+                entries_list.controls.append(create_entry_card(ev))
+
+        def fl_add_new(e):
+            dialog.open = False
+            page.update()
+            open_event_form_dialog(day, slot_number, None)
+
+        rebuild_entries_list()
 
         dialog = fl.AlertDialog(
             modal=True,
@@ -296,27 +481,22 @@ def panel_creator_dashboard(page: fl.Page):
                     controls=[
                         fl.Text(f"⏰ {slot_info}", size=13, color="#B0B0B0"),
                         fl.Divider(height=10, color="#3D3D3D"),
-                        name_field,
-                        fl.Divider(height=10, color="#3D3D3D"),
-                        fl.Row(controls=[grupos_block, humans_block], spacing=10),
-                        fl.Row(controls=[places_block, objects_block], spacing=10),
+                        entries_list,
                     ],
                     spacing=10,
-                    scroll=fl.ScrollMode.AUTO,
                 ),
-                width=400,
-                height=450,
+                width=380,
+                height=360,
             ),
             actions=[
-                fl.TextButton(
-                    "Eliminar",
-                    on_click=delete_event,
-                    style=fl.ButtonStyle(color="#F44336"),
-                ),
-                fl.TextButton("Cancelar", on_click=close_dialog),
                 fl.ElevatedButton(
-                    "Guardar", on_click=save_event, bgcolor="#4CAF50", color="white"
+                    "+ Agregar evento",
+                    icon=fl.Icons.ADD,
+                    on_click=fl_add_new,
+                    bgcolor=EVENT_COLOR,
+                    color="white",
                 ),
+                fl.TextButton("Cerrar", on_click=close_dialog),
             ],
             actions_alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
             bgcolor="#2D2D2D",
@@ -325,44 +505,70 @@ def panel_creator_dashboard(page: fl.Page):
         dialog.open = True
         page.update()
 
-    # ╚¤═══════¤CREACION EVENTOS¤════════¤╝
+    # ╚¤═══════¤EVENTOS EN CUBO¤════════¤╝
 
     # ╔¤═══════¤TABLA¤════════¤╗
     def create_event_cell(day: str, slot_number: int):
-        event = temp_save.get_schedule_event(day, slot_number)
-        if event and not event.is_empty():
-            chips = []
-            if event.name:
-                chips.append(
-                    fl.Text(
-                        event.name, size=11, weight=fl.FontWeight.BOLD, color="white"
-                    )
+        events_here = [
+            ev
+            for ev in temp_save.get_schedule_events_at(day, slot_number)
+            if not ev.is_empty()
+        ]
+
+        if events_here:
+            total_event_refs = sum(len(ev.event_ids) for ev in events_here)
+            total_groups = sum(len(ev.groups) for ev in events_here)
+            total_humans = sum(len(ev.humans) for ev in events_here)
+            total_places = sum(len(ev.places) for ev in events_here)
+            total_objects = sum(len(ev.objects) for ev in events_here)
+
+            chips = [
+                fl.Row(
+                    controls=[
+                        fl.Icon(EVENT_ICON, color=EVENT_COLOR, size=14),
+                        fl.Text(
+                            str(total_event_refs),
+                            size=12,
+                            weight=fl.FontWeight.BOLD,
+                            color="white",
+                        ),
+                    ],
+                    spacing=3,
+                    alignment=fl.MainAxisAlignment.CENTER,
                 )
+            ]
+
             resource_data = [
-                (event.groups, "👥", "#4CAF50"),
-                (event.humans, "🧑", "#FF9800"),
-                (event.places, "📍", "#2196F3"),
-                (event.objects, "📦", "#9C27B0"),
+                (total_groups, "👥", "#4CAF50"),
+                (total_humans, "🧑", "#FF9800"),
+                (total_places, "📍", "#2196F3"),
+                (total_objects, "📦", "#9C27B0"),
             ]
             resource_row = [
                 fl.Container(
-                    content=fl.Text(f"{emoji}{len(items)}", size=9),
+                    content=fl.Text(f"{emoji}{count}", size=9),
                     bgcolor=color,
                     border_radius=3,
                     padding=2,
                 )
-                for items, emoji, color in resource_data
-                if items
+                for count, emoji, color in resource_data
+                if count
             ]
             if resource_row:
                 chips.append(fl.Row(controls=resource_row, spacing=2, wrap=True))
+
+            if len(events_here) > 1:
+                chips.append(
+                    fl.Text(f"{len(events_here)} bloques", size=9, color="#858585")
+                )
+
             cell_content = fl.Column(
                 controls=chips,
                 spacing=3,
                 horizontal_alignment=fl.CrossAxisAlignment.CENTER,
             )
             cell_bgcolor = "#3D3D3D"
-            cell_border = fl.border.all(2, "#4CAF50")
+            cell_border = fl.border.all(2, EVENT_COLOR)
         else:
             cell_content = fl.Icon(fl.Icons.ADD, color="#858585", size=20)
             cell_bgcolor = "#252525"
@@ -376,7 +582,7 @@ def panel_creator_dashboard(page: fl.Page):
             width=110,
             height=70,
             alignment=fl.alignment.center,
-            on_click=lambda e: open_event_dialog(day, slot_number),
+            on_click=lambda e: open_slot_dialog(day, slot_number),
             ink=True,
         )
 
@@ -561,6 +767,7 @@ def panel_creator_dashboard(page: fl.Page):
                         ),
                         fl.Row(
                             controls=[
+                                legend_chip("📅 Eventos", EVENT_COLOR),
                                 legend_chip("👥 Grupos", "#4CAF50"),
                                 legend_chip("🧑 Humanos", "#FF9800"),
                                 legend_chip("📍 Lugares", "#2196F3"),

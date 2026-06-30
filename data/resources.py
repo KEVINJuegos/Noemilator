@@ -82,7 +82,8 @@ class TimeSlot:
 class ScheduleEvent:
     day: str
     slot_number: int
-    name: str = ""
+    id: int = 0
+    event_ids: list = field(default_factory=list)
     groups: list = field(default_factory=list)
     humans: list = field(default_factory=list)
     places: list = field(default_factory=list)
@@ -90,7 +91,7 @@ class ScheduleEvent:
 
     def is_empty(self) -> bool:
         return not (
-            self.name or self.groups or self.humans or self.places or self.objects
+            self.event_ids or self.groups or self.humans or self.places or self.objects
         )
 
 
