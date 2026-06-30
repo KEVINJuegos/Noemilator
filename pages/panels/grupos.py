@@ -57,7 +57,7 @@ def panel_creator_classesgroups(page: fl.Page):
             padding=fl.padding.only(left=15, top=8, bottom=8, right=8),
         )
 
-    # ╚¤═══════¤GRUPOS AGREGADOS¤════════¤╝
+    # ╚¤═══════¤GRUPOS LIST¤════════¤╝
 
     # ╔¤═══════¤INPUTS¤════════¤╗
     input_group_name = fl.TextField(

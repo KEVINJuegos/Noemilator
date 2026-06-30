@@ -1,125 +1,134 @@
+# events.py
 import flet as fl
-
-DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+from data import temp_save
 
 
 def panel_creator_events(page: fl.Page):
 
-    # ╔¤═══════¤TURNOS LIST¤════════¤╗
-    turnos_list = fl.Column(
+    # ╔¤═══════¤EVENTOS LIST¤════════¤╗
+    eventos_list = fl.Column(
         controls=[],
-        spacing=5,
+        spacing=10,
         scroll=fl.ScrollMode.AUTO,
         expand=True,
     )
 
-    # ╚¤═══════¤TURNOS LIST¤════════¤╝
+    def fl_delete_evento(evento_id):
+        def handler(e):
+            temp_save.remove_event(evento_id)
+            for control in eventos_list.controls:
+                if control.data == evento_id:
+                    eventos_list.controls.remove(control)
+                    break
+            page.update()
+
+        return handler
+
+    def create_onlist_evento(evento):
+        return fl.Container(
+            data=evento.id,
+            content=fl.Row(
+                controls=[
+                    fl.Row(
+                        controls=[
+                            fl.Icon(fl.Icons.EVENT_NOTE, color="#FF9800"),
+                            fl.Text(
+                                f"#{evento.id}",
+                                size=14,
+                                weight=fl.FontWeight.BOLD,
+                                color="#858585",
+                            ),
+                            fl.Text(
+                                evento.name,
+                                size=16,
+                                weight=fl.FontWeight.W_500,
+                                color="white",
+                            ),
+                        ],
+                        spacing=10,
+                    ),
+                    fl.IconButton(
+                        icon=fl.Icons.DELETE,
+                        icon_color="#F44336",
+                        icon_size=20,
+                        tooltip="Eliminar evento",
+                        on_click=fl_delete_evento(evento.id),
+                    ),
+                ],
+                alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
+                vertical_alignment=fl.CrossAxisAlignment.CENTER,
+            ),
+            bgcolor="#2D2D2D",
+            border_radius=8,
+            padding=fl.padding.only(left=15, top=8, bottom=8, right=8),
+        )
+
+    # ╚¤═══════¤EVENTOS LIST¤════════¤╝
 
     # ╔¤═══════¤INPUTS¤════════¤╗
-    dropdown_dia_inicio = fl.Dropdown(
-        label="Día Inicio",
-        value="Lunes",
+    input_event_name = fl.TextField(
+        label="Nombre del evento",
         bgcolor="#2D2D2D",
         border_color="#858585",
         color="white",
-        width=140,
+        width=200,
+        height=50,
         text_size=13,
-        options=[fl.dropdown.Option(d) for d in DAYS],
     )
 
-    dropdown_dia_fin = fl.Dropdown(
-        label="Día Fin",
-        value="Viernes",
-        bgcolor="#2D2D2D",
-        border_color="#858585",
-        color="white",
-        width=140,
-        text_size=13,
-        options=[fl.dropdown.Option(d) for d in DAYS],
-    )
+    def fl_add_evento(e):
+        if not input_event_name.value:
+            return
 
-    apply_days_button = fl.ElevatedButton(
-        text="Aplicar",
-        icon=fl.Icons.CHECK,
-        bgcolor="#4CAF50",
-        color="white",
-        height=45,
-    )
+        evento = temp_save.add_event(name=input_event_name.value)
+        eventos_list.controls.append(create_onlist_evento(evento))
+        input_event_name.value = ""
+        page.update()
 
-    add_turno_button = fl.ElevatedButton(
-        text="+ Agregar Turno",
+    addevent_button = fl.ElevatedButton(
+        text="Add",
+        icon=fl.Icons.ADD,
         bgcolor="#FF9800",
         color="white",
         height=45,
+        on_click=fl_add_evento,
     )
     # ╚¤═══════¤INPUTS¤════════¤╝
 
-    # ╔¤═══════¤CONFIG PANEL¤════════¤╗
-    turnos_panel = fl.Container(
+    # ╔¤═══════¤HEADER¤════════¤╗
+    header_eventos = fl.Row(
+        controls=[
+            fl.Text(
+                "📅 Eventos",
+                size=24,
+                weight=fl.FontWeight.BOLD,
+                color="white",
+            ),
+            fl.Row(
+                controls=[
+                    input_event_name,
+                    addevent_button,
+                ],
+                spacing=10,
+            ),
+        ],
+        alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
+        vertical_alignment=fl.CrossAxisAlignment.CENTER,
+    )
+    # ╚¤═══════¤HEADER¤════════¤╝
+
+    # Cargar datos existentes
+    [eventos_list.controls.append(create_onlist_evento(e)) for e in temp_save.get_events()]  # fmt: skip
+
+    return fl.Container(
         content=fl.Column(
             controls=[
-                fl.Text(
-                    "⚙️ Configuración",
-                    size=18,
-                    weight=fl.FontWeight.BOLD,
-                    color="white",
-                ),
+                header_eventos,
                 fl.Divider(height=10, color="#3D3D3D"),
-                fl.Text(
-                    "📅 Rango de Días",
-                    size=14,
-                    color="white",
-                ),
-                fl.Row(
-                    controls=[
-                        dropdown_dia_inicio,
-                        fl.Text(
-                            "→",
-                            size=16,
-                            color="white",
-                        ),
-                        dropdown_dia_fin,
-                    ],
-                    spacing=10,
-                    vertical_alignment=fl.CrossAxisAlignment.CENTER,
-                ),
-                apply_days_button,
-                fl.Divider(height=10, color="#3D3D3D"),
-                fl.Row(
-                    controls=[
-                        fl.Text(
-                            "⏰ Turnos",
-                            size=14,
-                            color="white",
-                        ),
-                        add_turno_button,
-                    ],
-                    alignment=fl.MainAxisAlignment.SPACE_BETWEEN,
-                    vertical_alignment=fl.CrossAxisAlignment.CENTER,
-                ),
-                fl.Container(
-                    content=turnos_list,
-                    expand=True,
-                    padding=10,
-                    border=fl.border.all(1, "#3D3D3D"),
-                    border_radius=8,
-                ),
+                eventos_list,
             ],
             spacing=10,
             expand=True,
-        ),
-        width=350,
-        padding=15,
-        bgcolor="#1E1E1E",
-        border_radius=10,
-    )
-    # ╚¤═══════¤CONFIG PANEL¤════════¤╝
-
-    return fl.Container(
-        content=fl.Row(
-            controls=[turnos_panel],
-            alignment=fl.MainAxisAlignment.START,
-            vertical_alignment=fl.CrossAxisAlignment.START,
         ),
         padding=20,
         expand=True,

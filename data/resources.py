@@ -1,14 +1,8 @@
 # resources.py
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
+DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
-HUMAN_TYPES = [
-    "Profesor(a)",
-    "Secretario(a)",
-    "Directivo(a)",
-    "Seguridad",
-    "Otro",
-]
 
 PLACE_TYPES = [
     "Aula",
@@ -21,6 +15,23 @@ PLACE_TYPES = [
     "Otro",
 ]
 
+HUMAN_TYPES = [
+    "Profesor(a)",
+    "Secretario(a)",
+    "Directivo(a)",
+    "Seguridad",
+    "Otro",
+]
+
+
+@dataclass
+class Event:
+    id: int
+    name: str
+
+    def __str__(self):
+        return f"#{self.id} {self.name}"
+
 
 @dataclass
 class ClassGroup:
@@ -28,6 +39,16 @@ class ClassGroup:
 
     def __str__(self):
         return self.name
+
+
+@dataclass
+class Place:
+    name: str
+    type: str = ""
+    quantity: int = 0
+
+    def __str__(self):
+        return f"{self.name} ({self.type}) x{self.quantity}"
 
 
 @dataclass
@@ -49,11 +70,41 @@ class Object:
         return f"{self.name} x{self.quantity}"
 
 
+# ╔¤═══════¤DASHBOARD¤════════¤╗
 @dataclass
-class Place:
-    name: str
-    type: str = ""
-    quantity: int = 0
+class TimeSlot:
+    number: int
+    start_time: str
+    end_time: str
 
-    def __str__(self):
-        return f"{self.name} ({self.type}) x{self.quantity}"
+
+@dataclass
+class ScheduleEvent:
+    day: str
+    slot_number: int
+    name: str = ""
+    groups: list = field(default_factory=list)
+    humans: list = field(default_factory=list)
+    places: list = field(default_factory=list)
+    objects: list = field(default_factory=list)
+
+    def is_empty(self) -> bool:
+        return not (
+            self.name or self.groups or self.humans or self.places or self.objects
+        )
+
+
+@dataclass
+class Schedule:
+    start_day: str = "Lunes"
+    end_day: str = "Viernes"
+    time_slots: list = field(default_factory=list)
+
+    def get_days(self) -> list:
+        if self.start_day not in DAYS or self.end_day not in DAYS:
+            return DAYS[:5]
+        start_idx = DAYS.index(self.start_day)
+        end_idx = DAYS.index(self.end_day)
+        if start_idx <= end_idx:
+            return DAYS[start_idx : end_idx + 1]
+        return DAYS[start_idx:] + DAYS[: end_idx + 1]

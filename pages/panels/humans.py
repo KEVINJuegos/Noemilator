@@ -1,3 +1,4 @@
+# humans.py
 import flet as fl
 from data import temp_save
 from data.resources import HUMAN_TYPES

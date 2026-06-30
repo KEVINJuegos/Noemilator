@@ -1,14 +1,20 @@
 import flet as fl
 import json
 from dataclasses import asdict
-from data.resources import ClassGroup, Human, Object, Place
+from data.resources import ClassGroup, Human, Object, Place, Event
+from data.resources import Schedule, TimeSlot, ScheduleEvent
 
 # ╔¤═══════¤VARIABLES TEMPORALES¤════════¤╗
 projecto_name = "Nuevo Proyecto"
+events: list[Event] = []
 grupos: list[ClassGroup] = []
 places: list[Place] = []
 humans: list[Human] = []
 objects: list[Object] = []
+
+_next_event_id = 1
+schedule: Schedule = Schedule()
+schedule_events: dict = {}
 # ╚¤═══════¤VARIABLES TEMPORALES¤════════¤╝
 
 
@@ -23,6 +29,80 @@ def fl_save_projecto_name(e):
 
 
 # ╚¤═══════¤PROJECT NAME¤════════¤╝
+
+
+# ╔¤═══════¤EVENTS¤════════¤╗
+def add_event(name):
+    global events, _next_event_id
+    event = Event(id=_next_event_id, name=name)
+    events.append(event)
+    _next_event_id += 1
+    return event
+
+
+def get_events():
+    return events
+
+
+def clear_events():
+    global events, _next_event_id
+    events = []
+    _next_event_id = 1
+
+
+def remove_event(event_id):
+    global events
+    for ev in events:
+        if ev.id == event_id:
+            events.remove(ev)
+            break
+
+
+# ╚¤═══════¤EVENTS¤════════¤╝
+
+
+# ╔¤═══════¤PLACES¤════════¤╗
+def add_place(name, type_p="", quantity=0):
+    global places
+    place = Place(name=name, type=type_p, quantity=quantity)
+    places.append(place)
+    return place
+
+
+def get_places():
+    return places
+
+
+def clear_places():
+    global places
+    places = []
+
+
+def remove_place(place_name):
+    global places
+    for p in places:
+        if p.name == place_name:
+            places.remove(p)
+            break
+
+
+def update_place_type(place_name, new_type):
+    global places
+    for p in places:
+        if p.name == place_name:
+            p.type = new_type
+            break
+
+
+def update_place_quantity(place_name, new_quantity):
+    global places
+    for p in places:
+        if p.name == place_name:
+            p.quantity = new_quantity
+            break
+
+
+# ╚¤═══════¤PLACES¤════════¤╝
 
 
 # ╔¤═══════¤GRUPOS¤════════¤╗
@@ -97,50 +177,6 @@ def update_human_quantity(human_name, new_quantity):
 # ╚¤═══════¤HUMANS¤════════¤╝
 
 
-# ╔¤═══════¤PLACES¤════════¤╗
-def add_place(name, type_p="", quantity=0):
-    global places
-    place = Place(name=name, type=type_p, quantity=quantity)
-    places.append(place)
-    return place
-
-
-def get_places():
-    return places
-
-
-def clear_places():
-    global places
-    places = []
-
-
-def remove_place(place_name):
-    global places
-    for p in places:
-        if p.name == place_name:
-            places.remove(p)
-            break
-
-
-def update_place_type(place_name, new_type):
-    global places
-    for p in places:
-        if p.name == place_name:
-            p.type = new_type
-            break
-
-
-def update_place_quantity(place_name, new_quantity):
-    global places
-    for p in places:
-        if p.name == place_name:
-            p.quantity = new_quantity
-            break
-
-
-# ╚¤═══════¤PLACES¤════════¤╝
-
-
 # ╔¤═══════¤OBJECTS¤════════¤╗
 def add_object(name, quantity=0):
     global objects
@@ -177,6 +213,73 @@ def update_object_quantity(object_name, new_quantity):
 # ╚¤═══════¤OBJECTS¤════════¤╝
 
 
+# ╔¤═══════¤SCHEDULE¤════════¤╗
+def get_schedule():
+    return schedule
+
+
+def set_schedule_days(start_day, end_day):
+    schedule.start_day = start_day
+    schedule.end_day = end_day
+
+
+def add_time_slot(start_time="08:00", end_time="08:45"):
+    existing_numbers = [s.number for s in schedule.time_slots]
+    number = max(existing_numbers, default=0) + 1
+    slot = TimeSlot(number=number, start_time=start_time, end_time=end_time)
+    schedule.time_slots.append(slot)
+    return slot
+
+
+def update_time_slot(number, start_time=None, end_time=None):
+    for slot in schedule.time_slots:
+        if slot.number == number:
+            if start_time is not None:
+                slot.start_time = start_time
+            if end_time is not None:
+                slot.end_time = end_time
+            break
+
+
+def remove_time_slot(number):
+    global schedule, schedule_events
+    schedule.time_slots = [s for s in schedule.time_slots if s.number != number]
+    keys_to_remove = [k for k in schedule_events if k[1] == number]
+    for k in keys_to_remove:
+        del schedule_events[k]
+
+
+def clear_schedule():
+    global schedule, schedule_events
+    schedule = Schedule()
+    schedule_events = {}
+
+
+# ╚¤═══════¤SCHEDULE¤════════¤╝
+
+
+# ╔¤═══════¤SCHEDULE EVENTS¤════════¤╗
+def get_schedule_event(day, slot_number):
+    return schedule_events.get((day, slot_number))
+
+
+def get_schedule_events():
+    return list(schedule_events.values())
+
+
+def set_schedule_event(event: ScheduleEvent):
+    schedule_events[(event.day, event.slot_number)] = event
+
+
+def remove_schedule_event(day, slot_number):
+    key = (day, slot_number)
+    if key in schedule_events:
+        del schedule_events[key]
+
+
+# ╚¤═══════¤SCHEDULE EVENTS¤════════¤╝
+
+
 # ╔¤═══════¤EXPORT/IMPORT JSON¤════════¤╗
 def export_to_json(filepath):
     data = {
@@ -185,6 +288,9 @@ def export_to_json(filepath):
         "places": [asdict(p) for p in places],
         "humans": [asdict(h) for h in humans],
         "objects": [asdict(o) for o in objects],
+        "events": [asdict(ev) for ev in events],
+        "schedule": asdict(schedule),
+        "schedule_events": [asdict(ev) for ev in schedule_events.values()],
     }
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
