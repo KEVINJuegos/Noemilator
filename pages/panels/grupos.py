@@ -5,7 +5,7 @@ from data import temp_save
 
 def panel_creator_classesgroups(page: fl.Page):
 
-    # ╔¤═══════¤GRUPOS AGREGADOS¤════════¤╗
+    # ╔¤═══════¤GRUPOS LIST¤════════¤╗
     grupos_list = fl.Column(
         controls=[],
         spacing=10,

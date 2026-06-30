@@ -20,7 +20,7 @@ def main(page: fl.Page):
         page.views.pop()
 
         top_page = page.views[-1]
-        page.go(top_page.route)  # type:ignore
+        page.go(top_page.route)  # type: ignore
 
     page.on_route_change = navigator
     page.on_view_pop = navigator_back

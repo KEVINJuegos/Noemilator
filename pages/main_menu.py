@@ -11,7 +11,7 @@ def main_menu(page: fl.Page):
         controls=[
             fl.Text(value="Menú Principal"),
             fl.ElevatedButton("New", on_click=lambda _: page.go("/workspace")),
-            fl.ElevatedButton("Settings"),
+            fl.ElevatedButton("Load"),
             fl.ElevatedButton("Exit", on_click=lambda _: page.window.close()),
         ],
         horizontal_alignment=fl.CrossAxisAlignment.CENTER,
